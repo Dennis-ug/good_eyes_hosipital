@@ -1,7 +1,7 @@
-# Eye Clinic Management System - Project Documentation
+# Good Eyes Hospital Management System - Project Documentation
 
 ## Project Overview
-The Eye Clinic Management System is a comprehensive Spring Boot application designed for managing eye clinic operations including patient management, appointments, eye examinations, doctor schedules, inventory, and financial operations.
+The Good Eyes Hospital Management System is a comprehensive Spring Boot application designed for managing hospital operations including patient management, appointments, eye examinations, doctor schedules, inventory, and financial operations.
 
 ## Technology Stack
 - **Framework**: Spring Boot 3.5.4

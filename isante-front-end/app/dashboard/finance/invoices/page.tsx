@@ -131,7 +131,7 @@ export default function InvoicesPage() {
       </head>
       <body>
         <div class="header">
-          <h1>Eyesante Healthcare</h1>
+          <h1>Good Eyes Hospital</h1>
           <h2>Invoice</h2>
         </div>
         

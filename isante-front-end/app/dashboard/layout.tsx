@@ -391,8 +391,8 @@ export default function DashboardLayout({
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white dark:bg-gray-800 shadow-2xl">
           <div className="flex h-16 items-center justify-between px-6 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center">
-              <Image src="/logo.png" alt="Eyesante" width={32} height={32} className="rounded-md" />
-              <span className="ml-3 text-xl font-bold text-gray-900 dark:text-white">Eyesante</span>
+              <Image src="/logo.png" alt="Good Eyes Hospital" width={32} height={32} className="rounded-md" />
+              <span className="ml-3 text-xl font-bold text-gray-900 dark:text-white">Good Eyes Hospital</span>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -413,8 +413,8 @@ export default function DashboardLayout({
           {/* Header */}
           <div className="flex h-20 items-center px-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700">
             <div className="flex items-center">
-              <Image src="/logo.png" alt="Eyesante" width={40} height={40} className="rounded-md" />
-              <span className="ml-3 text-2xl font-bold text-gray-900 dark:text-white">Eyesante</span>
+              <Image src="/logo.png" alt="Good Eyes Hospital" width={40} height={40} className="rounded-md" />
+              <span className="ml-3 text-2xl font-bold text-gray-900 dark:text-white">Good Eyes Hospital</span>
             </div>
           </div>
           

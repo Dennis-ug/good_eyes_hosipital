@@ -134,7 +134,7 @@ export class ThermalPrinter {
     if (data.footerMessage) {
       receipt += center(data.footerMessage) + '\n'
     }
-    receipt += center('Thank you for choosing Eye Sante Clinic') + '\n'
+    receipt += center('Thank you for choosing Good Eyes Hospital') + '\n'
     receipt += center('For inquiries: ' + data.clinicPhone) + '\n'
     receipt += doubleLine() + '\n'
     receipt += center('System Developed and Maintained by:') + '\n'
@@ -294,7 +294,7 @@ export class ThermalPrinter {
     const now = new Date()
     
     return {
-      clinicName: 'EYE SANTE CLINIC',
+      clinicName: 'GOOD EYES HOSPITAL',
       clinicAddress: 'Plot 47, Lumumba Avenue, Nakasero, Kampala - Uganda',
       clinicPhone: '+256 758 341 772 / +256 200 979 911',
       receiptNumber: invoice.invoiceNumber || `RCP-${Date.now()}`,

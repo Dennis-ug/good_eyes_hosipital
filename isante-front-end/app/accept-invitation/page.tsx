@@ -161,7 +161,7 @@ function AcceptInvitationContent() {
           <Mail className="h-16 w-16 text-blue-600 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-gray-900">Complete Your Account Setup</h1>
           <p className="mt-2 text-gray-600">
-            Welcome to Eyesante Eye Clinic Management System
+            Welcome to Good Eyes Hospital Management System
           </p>
         </div>
 

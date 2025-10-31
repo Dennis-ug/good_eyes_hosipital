@@ -1,10 +1,10 @@
-# iSante Healthcare System - Docker Setup
+# Good Eyes Hospital - Docker Setup
 
-This document provides instructions for running the complete iSante Healthcare System using Docker Compose.
+This document provides instructions for running the complete Good Eyes Hospital Healthcare Management System using Docker Compose.
 
 ## System Overview
 
-The iSante Healthcare System consists of four main components:
+The Good Eyes Hospital Healthcare Management System consists of four main components:
 
 1. **PostgreSQL Database** - Stores all application data
 2. **Spring Boot Backend** - REST API server (Java)
@@ -154,7 +154,7 @@ All services include health checks to ensure they're running properly:
 When adding the PostgreSQL server, use these settings:
 
 - **General Tab**:
-  - Name: `Eyesante Database`
+  - Name: `Good Eyes Hospital Database`
 - **Connection Tab**:
   - Host name/address: `postgres`
   - Port: `5432`

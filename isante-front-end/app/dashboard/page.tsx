@@ -841,7 +841,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-        <p className="text-gray-600 dark:text-gray-400">Welcome to Eyesante</p>
+        <p className="text-gray-600 dark:text-gray-400">Welcome to Good Eyes Hospital</p>
       </div>
 
       {/* Stats */}

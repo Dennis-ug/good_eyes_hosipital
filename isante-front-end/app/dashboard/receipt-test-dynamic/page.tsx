@@ -18,7 +18,7 @@ export default function ReceiptTestDynamicPage() {
     clinicEmail: undefined,
     clinicWebsite: undefined,
     clinicLogoText: 'Seeing is Life',
-    receiptFooterMessage: 'Thank you for choosing Eye Sante Clinic',
+    receiptFooterMessage: 'Thank you for choosing Good Eyes Hospital',
     receiptContactMessage: 'For inquiries: ',
     receiptNumber: 'RCP-2025-001',
     date: new Date().toLocaleDateString(),

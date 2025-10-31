@@ -1,4 +1,4 @@
-# iSante Healthcare System
+# Good Eyes Hospital - Healthcare Management System
 
 A comprehensive healthcare management system built with Next.js frontend and Spring Boot backend.
 

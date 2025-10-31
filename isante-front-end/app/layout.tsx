@@ -4,8 +4,8 @@ import { AuthProvider } from "@/lib/auth-context";
 import { ClientThemeProvider } from "@/components/client-theme-provider";
 
 export const metadata: Metadata = {
-  title: "Eyesante - Hospital Management System",
-  description: "Super Admin Dashboard for Eyesante Hospital Management System",
+  title: "Good Eyes Hospital - Hospital Management System",
+  description: "Super Admin Dashboard for Good Eyes Hospital Management System",
 };
 
 export default function RootLayout({

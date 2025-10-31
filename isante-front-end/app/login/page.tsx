@@ -55,10 +55,10 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="mx-auto h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-            <Image src="/logo.png" alt="Eyesante" width={32} height={32} className="rounded-md" />
+            <Image src="/logo.png" alt="Good Eyes Hospital" width={32} height={32} className="rounded-md" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Eyesante Admin
+            Good Eyes Hospital Admin
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
             Sign in to your super admin account

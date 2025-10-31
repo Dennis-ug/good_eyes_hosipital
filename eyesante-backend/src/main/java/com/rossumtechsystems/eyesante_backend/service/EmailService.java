@@ -29,18 +29,18 @@ public class EmailService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(to);
-            message.setSubject("Welcome to Eyesante Eye Clinic Management System");
+            message.setSubject("Welcome to Good Eyes Hospital Management System");
             
             String emailContent = String.format(
                 "Dear %s,\n\n" +
-                "Welcome to the Eyesante Eye Clinic Management System!\n\n" +
+                "Welcome to the Good Eyes Hospital Management System!\n\n" +
                 "Your account has been created successfully.\n" +
                 "Username: %s\n" +
                 "Temporary Password: %s\n\n" +
                 "Please change your password on your first login.\n\n" +
                 "%s\n\n" +
                 "Best regards,\n" +
-                "Eyesante Eye Clinic Team",
+                "Good Eyes Hospital Team",
                 username, username, temporaryPassword, 
                 customMessage != null ? customMessage : ""
             );
@@ -61,11 +61,11 @@ public class EmailService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(adminEmail);
-            message.setSubject("User Creation Confirmation - Eyesante Eye Clinic");
+            message.setSubject("User Creation Confirmation - Good Eyes Hospital");
             
             String emailContent = String.format(
                 "Dear Administrator,\n\n" +
-                "A new user has been successfully created in the Eyesante Eye Clinic Management System.\n\n" +
+                "A new user has been successfully created in the Good Eyes Hospital Management System.\n\n" +
                 "User Details:\n" +
                 "Username: %s\n" +
                 "Email: %s\n" +
@@ -73,7 +73,7 @@ public class EmailService {
                 "Department: %s\n\n" +
                 "The user has been notified via email with their login credentials.\n\n" +
                 "Best regards,\n" +
-                "Eyesante Eye Clinic System",
+                "Good Eyes Hospital System",
                 createdUsername, createdEmail, roles, department
             );
             
@@ -94,11 +94,11 @@ public class EmailService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(patientEmail);
-            message.setSubject("Appointment Confirmation - Eyesante Eye Clinic");
+            message.setSubject("Appointment Confirmation - Good Eyes Hospital");
             
             String emailContent = String.format(
                 "Dear %s,\n\n" +
-                "Your appointment has been successfully scheduled at Eyesante Eye Clinic.\n\n" +
+                "Your appointment has been successfully scheduled at Good Eyes Hospital.\n\n" +
                 "Appointment Details:\n" +
                 "Doctor: %s\n" +
                 "Date: %s\n" +
@@ -107,7 +107,7 @@ public class EmailService {
                 "Please arrive 10 minutes before your scheduled time.\n" +
                 "If you need to reschedule or cancel, please contact us at least 24 hours in advance.\n\n" +
                 "Best regards,\n" +
-                "Eyesante Eye Clinic Team",
+                "Good Eyes Hospital Team",
                 patientName, doctorName, appointmentDate, appointmentTime, appointmentType
             );
             
@@ -128,11 +128,11 @@ public class EmailService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(patientEmail);
-            message.setSubject("Appointment Reminder - Eyesante Eye Clinic");
+            message.setSubject("Appointment Reminder - Good Eyes Hospital");
             
             String emailContent = String.format(
                 "Dear %s,\n\n" +
-                "This is a friendly reminder of your upcoming appointment at Eyesante Eye Clinic.\n\n" +
+                "This is a friendly reminder of your upcoming appointment at Good Eyes Hospital.\n\n" +
                 "Appointment Details:\n" +
                 "Doctor: %s\n" +
                 "Date: %s\n" +
@@ -140,7 +140,7 @@ public class EmailService {
                 "Please arrive 10 minutes before your scheduled time.\n" +
                 "If you need to reschedule or cancel, please contact us immediately.\n\n" +
                 "Best regards,\n" +
-                "Eyesante Eye Clinic Team",
+                "Good Eyes Hospital Team",
                 patientName, doctorName, appointmentDate, appointmentTime
             );
             
@@ -160,13 +160,13 @@ public class EmailService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(email);
-            message.setSubject("Password Reset Request - Eyesante Eye Clinic");
+            message.setSubject("Password Reset Request - Good Eyes Hospital");
             
             String resetLink = "https://isante-demo.rossumtechsystems.com/reset-password?token=" + resetToken;
             
             String emailContent = String.format(
                 "Dear %s,\n\n" +
-                "You have requested to reset your password for the Eyesante Eye Clinic Management System.\n\n" +
+                "You have requested to reset your password for the Good Eyes Hospital Management System.\n\n" +
                 "To reset your password, please click on the following link:\n" +
                 "%s\n\n" +
                 "This link will expire in 24 hours for security reasons.\n\n" +
@@ -174,7 +174,7 @@ public class EmailService {
                 "Your password will remain unchanged.\n\n" +
                 "For security reasons, please do not share this link with anyone.\n\n" +
                 "Best regards,\n" +
-                "Eyesante Eye Clinic Team",
+                "Good Eyes Hospital Team",
                 username, resetLink
             );
             
@@ -194,15 +194,15 @@ public class EmailService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(email);
-            message.setSubject("Password Reset Successful - Eyesante Eye Clinic");
+            message.setSubject("Password Reset Successful - Good Eyes Hospital");
             
             String emailContent = String.format(
                 "Dear %s,\n\n" +
-                "Your password has been successfully reset for the Eyesante Eye Clinic Management System.\n\n" +
+                "Your password has been successfully reset for the Good Eyes Hospital Management System.\n\n" +
                 "You can now log in to your account using your new password.\n\n" +
                 "If you did not perform this action, please contact the system administrator immediately.\n\n" +
                 "Best regards,\n" +
-                "Eyesante Eye Clinic Team",
+                "Good Eyes Hospital Team",
                 username
             );
             
@@ -222,17 +222,17 @@ public class EmailService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(email);
-            message.setSubject("Temporary Password - Eyesante Eye Clinic");
+            message.setSubject("Temporary Password - Good Eyes Hospital");
             
             String emailContent = String.format(
                 "Dear %s,\n\n" +
-                "A temporary password has been generated for your account in the Eyesante Eye Clinic Management System.\n\n" +
+                "A temporary password has been generated for your account in the Good Eyes Hospital Management System.\n\n" +
                 "Username: %s\n" +
                 "Temporary Password: %s\n\n" +
                 "Please log in with this temporary password and change it to a secure password of your choice.\n\n" +
                 "For security reasons, this temporary password will expire once you change it.\n\n" +
                 "Best regards,\n" +
-                "Eyesante Eye Clinic Team",
+                "Good Eyes Hospital Team",
                 username, username, temporaryPassword
             );
             
@@ -252,14 +252,14 @@ public class EmailService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(email);
-            message.setSubject("Password Changed Successfully - Eyesante Eye Clinic");
+            message.setSubject("Password Changed Successfully - Good Eyes Hospital");
             
             String emailContent = String.format(
                 "Dear %s,\n\n" +
-                "Your password has been successfully changed for the Eyesante Eye Clinic Management System.\n\n" +
+                "Your password has been successfully changed for the Good Eyes Hospital Management System.\n\n" +
                 "If you did not perform this action, please contact the system administrator immediately.\n\n" +
                 "Best regards,\n" +
-                "Eyesante Eye Clinic Team",
+                "Good Eyes Hospital Team",
                 username
             );
             
@@ -279,20 +279,20 @@ public class EmailService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(email);
-            message.setSubject("Set Up Your Account Password - Eyesante Eye Clinic");
+            message.setSubject("Set Up Your Account Password - Good Eyes Hospital");
             
             String setupLink = "https://isante-demo.rossumtechsystems.com/setup-password?token=" + setupToken;
             
             String emailContent = String.format(
                 "Dear %s,\n\n" +
-                "Welcome to the Eyesante Eye Clinic Management System!\n\n" +
+                "Welcome to the Good Eyes Hospital Management System!\n\n" +
                 "Your account has been created successfully. To complete your account setup, please set your password by clicking on the following link:\n\n" +
                 "%s\n\n" +
                 "This link will expire in 24 hours for security reasons.\n\n" +
                 "Please choose a strong password that you will remember.\n\n" +
                 "If you did not expect this email, please contact the system administrator immediately.\n\n" +
                 "Best regards,\n" +
-                "Eyesante Eye Clinic Team",
+                "Good Eyes Hospital Team",
                 username, setupLink
             );
             
@@ -312,13 +312,13 @@ public void sendUserInvitationEmail(String email, String firstName, String lastN
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);
         message.setTo(email);
-        message.setSubject("You're Invited to Join Eyesante Eye Clinic Management System");
+        message.setSubject("You're Invited to Join Good Eyes Hospital Management System");
         
         String invitationLink = "https://isante-demo.rossumtechsystems.com/accept-invitation?token=" + invitationToken;
         
         String emailContent = String.format(
             "Dear %s %s,\n\n" +
-            "You have been invited to join the Eyesante Eye Clinic Management System!\n\n" +
+            "You have been invited to join the Good Eyes Hospital Management System!\n\n" +
             "To complete your account setup, please click on the following link:\n" +
             "%s\n\n" +
             "This invitation link will expire in 24 hours for security reasons.\n\n" +
@@ -329,7 +329,7 @@ public void sendUserInvitationEmail(String email, String firstName, String lastN
             "%s\n\n" +
             "If you did not expect this invitation, please ignore this email.\n\n" +
             "Best regards,\n" +
-            "Eyesante Eye Clinic Team",
+            "Good Eyes Hospital Team",
             firstName, lastName, invitationLink, 
             customMessage != null && !customMessage.trim().isEmpty() ? customMessage : ""
         );

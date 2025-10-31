@@ -47,7 +47,7 @@ export default function ReceiptTestPage() {
     paymentMethod: 'MOBILE_MONEY',
     paymentReference: 'TXN123456789',
     cashierName: 'Dr. Sarah Johnson',
-    footerMessage: 'Thank you for choosing Eye Sante Clinic'
+    footerMessage: 'Thank you for choosing Good Eyes Hospital'
   }
 
   return (
