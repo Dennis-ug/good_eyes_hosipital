@@ -30,12 +30,14 @@ services:
       - .env
     # ports:
     #   - "5025:5025"
+    # Note: Ports are not exposed to host to avoid conflicts. Services are accessible via Traefik only.
     # depends_on:
     #   - postgres
     networks:
       - main_host
       
     restart: unless-stopped
+    # Health check runs inside container, so localhost:5025 refers to container's localhost (not host)
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5025/api/auth/test"]
       interval: 30s
@@ -67,12 +69,14 @@ services:
       - .env
     # ports:
     #   - "3000:3000"
+    # Note: Ports are not exposed to host to avoid conflicts. Services are accessible via Traefik only.
     depends_on:
       backend:
         condition: service_healthy
     networks:
       - main_host
     restart: unless-stopped
+    # Health check runs inside container, so localhost:3000 refers to container's localhost (not host)
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 30s
