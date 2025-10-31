@@ -1,0 +1,279 @@
+package com.rossumtechsystems.eyesante_backend.entity.eye_exmination;
+
+import com.rossumtechsystems.eyesante_backend.entity.BaseAuditEntity;
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name = "basic_refraction_exams")
+public class BasicRefractionExam extends BaseAuditEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "visit_session_id", nullable = false)
+    private com.rossumtechsystems.eyesante_backend.entity.PatientVisitSession visitSession;
+    
+    // Neuro/Psych Section
+    @Column(name = "neuro_oriented")
+    private Boolean neuroOriented; // Oriented x3 checkbox
+    
+    @Column(name = "neuro_mood")
+    private String neuroMood; // Mood/Affect text
+    
+    @Column(name = "neuro_psych_notes")
+    private String neuroPsychNotes;
+    
+    // Pupils Section
+    @Column(name = "pupils_perrl")
+    private Boolean pupilsPerrl; // PERRL checkbox
+    
+    // Right Eye Pupils
+    @Column(name = "pupils_right_dark")
+    private String pupilsRightDark;
+    
+    @Column(name = "pupils_right_light")
+    private String pupilsRightLight;
+    
+    @Column(name = "pupils_right_shape")
+    private String pupilsRightShape;
+    
+    @Column(name = "pupils_right_react")
+    private String pupilsRightReact;
+    
+    @Column(name = "pupils_right_apd")
+    private String pupilsRightApd;
+    
+    // Left Eye Pupils
+    @Column(name = "pupils_left_dark")
+    private String pupilsLeftDark;
+    
+    @Column(name = "pupils_left_light")
+    private String pupilsLeftLight;
+    
+    @Column(name = "pupils_left_shape")
+    private String pupilsLeftShape;
+    
+    @Column(name = "pupils_left_react")
+    private String pupilsLeftReact;
+    
+    @Column(name = "pupils_left_apd")
+    private String pupilsLeftApd;
+    
+    @Column(name = "pupils_notes")
+    private String pupilsNotes;
+    
+    // Visual Acuity Section
+    // Distance - Right Eye
+    @Column(name = "visual_acuity_distance_sc_right")
+    private String visualAcuityDistanceScRight;
+    
+    @Column(name = "visual_acuity_distance_ph_right")
+    private String visualAcuityDistancePhRight;
+    
+    @Column(name = "visual_acuity_distance_cc_right")
+    private String visualAcuityDistanceCcRight;
+    
+    // Distance - Left Eye
+    @Column(name = "visual_acuity_distance_sc_left")
+    private String visualAcuityDistanceScLeft;
+    
+    @Column(name = "visual_acuity_distance_ph_left")
+    private String visualAcuityDistancePhLeft;
+    
+    @Column(name = "visual_acuity_distance_cc_left")
+    private String visualAcuityDistanceCcLeft;
+    
+    // Near - Right Eye
+    @Column(name = "visual_acuity_near_sc_right")
+    private String visualAcuityNearScRight;
+    
+    @Column(name = "visual_acuity_near_cc_right")
+    private String visualAcuityNearCcRight;
+    
+    // Near - Left Eye
+    @Column(name = "visual_acuity_near_sc_left")
+    private String visualAcuityNearScLeft;
+    
+    @Column(name = "visual_acuity_near_cc_left")
+    private String visualAcuityNearCcLeft;
+    
+    @Column(name = "visual_acuity_notes")
+    private String visualAcuityNotes;
+    
+    // Refraction Section
+    // Autorefractor - Right Eye
+    @Column(name = "manifest_auto_right_sphere")
+    private Double manifestAutoRightSphere;
+    
+    @Column(name = "manifest_auto_right_cylinder")
+    private Double manifestAutoRightCylinder;
+    
+    @Column(name = "manifest_auto_right_axis")
+    private Integer manifestAutoRightAxis;
+    
+    // Autorefractor - Left Eye
+    @Column(name = "manifest_auto_left_sphere")
+    private Double manifestAutoLeftSphere;
+    
+    @Column(name = "manifest_auto_left_cylinder")
+    private Double manifestAutoLeftCylinder;
+    
+    @Column(name = "manifest_auto_left_axis")
+    private Integer manifestAutoLeftAxis;
+    
+    // Keratometry - Right Eye
+    @Column(name = "keratometry_k1_right")
+    private Double keratometryK1Right;
+    
+    @Column(name = "keratometry_k2_right")
+    private Double keratometryK2Right;
+    
+    @Column(name = "keratometry_axis_right")
+    private Integer keratometryAxisRight;
+    
+    // Keratometry - Left Eye
+    @Column(name = "keratometry_k1_left")
+    private Double keratometryK1Left;
+    
+    @Column(name = "keratometry_k2_left")
+    private Double keratometryK2Left;
+    
+    @Column(name = "keratometry_axis_left")
+    private Integer keratometryAxisLeft;
+    
+    // Retinoscope - Right Eye
+    @Column(name = "manifest_ret_right_sphere")
+    private Double manifestRetRightSphere;
+    
+    @Column(name = "manifest_ret_right_cylinder")
+    private Double manifestRetRightCylinder;
+    
+    @Column(name = "manifest_ret_right_axis")
+    private Integer manifestRetRightAxis;
+    
+    // Retinoscope - Left Eye
+    @Column(name = "manifest_ret_left_sphere")
+    private Double manifestRetLeftSphere;
+    
+    @Column(name = "manifest_ret_left_cylinder")
+    private Double manifestRetLeftCylinder;
+    
+    @Column(name = "manifest_ret_left_axis")
+    private Integer manifestRetLeftAxis;
+    
+    // Subjective - Right Eye
+    @Column(name = "subjective_right_sphere")
+    private Double subjectiveRightSphere;
+    
+    @Column(name = "subjective_right_cylinder")
+    private Double subjectiveRightCylinder;
+    
+    @Column(name = "subjective_right_axis")
+    private Integer subjectiveRightAxis;
+    
+    // Subjective - Left Eye
+    @Column(name = "subjective_left_sphere")
+    private Double subjectiveLeftSphere;
+    
+    @Column(name = "subjective_left_cylinder")
+    private Double subjectiveLeftCylinder;
+    
+    @Column(name = "subjective_left_axis")
+    private Integer subjectiveLeftAxis;
+    
+    // Additional Refraction Data
+    @Column(name = "added_values")
+    private String addedValues;
+    
+    @Column(name = "best_right_vision")
+    private String bestRightVision;
+    
+    @Column(name = "best_left_vision")
+    private String bestLeftVision;
+    
+    @Column(name = "pd_right_eye")
+    private Double pdRightEye;
+    
+    @Column(name = "pd_left_eye")
+    private Double pdLeftEye;
+    
+    @Column(name = "refraction_notes")
+    private String refractionNotes;
+    
+    // Comments
+    @Column(name = "comment", columnDefinition = "TEXT")
+    private String comment;
+    
+    @Column(name = "examination_date")
+    private java.time.LocalDateTime examinationDate;
+    
+    @Column(name = "examined_by")
+    private String examinedBy;
+    
+    // Additional measurements
+    
+    // Pupil Size Measurements
+    @Column(name = "pupil_size_right", precision = 4, scale = 1)
+    private Double pupilSizeRight;
+    
+    @Column(name = "pupil_size_left", precision = 4, scale = 1)
+    private Double pupilSizeLeft;
+    
+    @Column(name = "pupil_size_unit")
+    private String pupilSizeUnit;
+    
+    // Intraocular Pressure
+    @Column(name = "iop_right")
+    private Integer iopRight;
+    
+    @Column(name = "iop_left")
+    private Integer iopLeft;
+    
+    @Column(name = "iop_method")
+    private String iopMethod;
+    
+    // Color Vision Testing
+    @Column(name = "color_vision_right")
+    private String colorVisionRight;
+    
+    @Column(name = "color_vision_left")
+    private String colorVisionLeft;
+    
+    @Column(name = "color_vision_test")
+    private String colorVisionTest;
+    
+    // Stereopsis Measurement
+    @Column(name = "stereopsis")
+    private Integer stereopsis;
+    
+    @Column(name = "stereopsis_unit")
+    private String stereopsisUnit;
+    
+    // Near Addition for Presbyopia
+    @Column(name = "near_addition_right", precision = 4, scale = 2)
+    private Double nearAdditionRight;
+    
+    @Column(name = "near_addition_left", precision = 4, scale = 2)
+    private Double nearAdditionLeft;
+    
+    // Clinical Assessment
+    @Column(name = "clinical_assessment", columnDefinition = "TEXT")
+    private String clinicalAssessment;
+    
+    @Column(name = "diagnosis", columnDefinition = "TEXT")
+    private String diagnosis;
+    
+    @Column(name = "treatment_plan", columnDefinition = "TEXT")
+    private String treatmentPlan;
+    
+    // Equipment Tracking
+    @Column(name = "equipment_used")
+    private String equipmentUsed;
+    
+    @Column(name = "equipment_calibration_date")
+    private java.time.LocalDate equipmentCalibrationDate;
+}

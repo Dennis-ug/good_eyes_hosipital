@@ -1,0 +1,1102 @@
+{
+  "info": {
+    "name": "Eyesante Healthcare Management System API",
+    "description": "Complete API collection for the Eyesante Healthcare Management System backend",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5025",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"superadmin\",\n  \"password\": \"superadmin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"superadmin123\",\n  \"newPassword\": \"newpassword123\",\n  \"confirmPassword\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/change-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "change-password"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/user-management/users?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user-management", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/user-management/users/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user-management", "users", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"newdoctor\",\n  \"email\": \"doctor@eyesante.com\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"departmentId\": 1,\n  \"roles\": [\"OPHTHALMOLOGIST\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/user-management/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user-management", "users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Roles",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\"OPHTHALMOLOGIST\", \"DOCTOR\"]"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/user-management/users/12/roles",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user-management", "users", "12", "roles"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/user-management/users/13",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user-management", "users", "13"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Department Management",
+      "item": [
+        {
+          "name": "Get All Departments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/departments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "departments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Department by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/departments/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "departments", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Department",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cardiology\",\n  \"description\": \"Cardiology department\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/departments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "departments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Department",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Cardiology\",\n  \"description\": \"Updated cardiology department\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/departments/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "departments", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Department",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/departments/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "departments", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Role Management",
+      "item": [
+        {
+          "name": "Get All Roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/roles",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "roles"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Role by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/roles/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "roles", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NURSE\",\n  \"description\": \"Nurse role for patient care\",\n  \"enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/roles",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "roles"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SENIOR_NURSE\",\n  \"description\": \"Senior nurse role\",\n  \"enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/roles/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "roles", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Role",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/roles/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "roles", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Appointment Management",
+      "item": [
+        {
+          "name": "Get All Appointments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/appointments?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Appointment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/appointments/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": 1,\n  \"doctorId\": 12,\n  \"appointmentDate\": \"2025-08-03\",\n  \"appointmentTime\": \"09:00:00\",\n  \"duration\": 30,\n  \"appointmentType\": \"ROUTINE_EXAMINATION\",\n  \"reason\": \"Regular eye checkup\",\n  \"priority\": \"NORMAL\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/appointments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Appointment Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/appointments/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments", "1", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Appointment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cancellationReason\": \"Patient requested cancellation\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/appointments/1/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments", "1", "cancel"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check Appointment Conflicts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctorId\": 12,\n  \"appointmentDate\": \"2025-08-03\",\n  \"startTime\": \"09:00:00\",\n  \"endTime\": \"09:30:00\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/appointments/conflicts/check",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments", "conflicts", "check"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check Doctor Availability",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/appointments/doctor/12/availability?date=2025-08-03&startTime=09:00:00&endTime=09:30:00",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointments", "doctor", "12", "availability"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2025-08-03"
+                },
+                {
+                  "key": "startTime",
+                  "value": "09:00:00"
+                },
+                {
+                  "key": "endTime",
+                  "value": "09:30:00"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Doctor Schedule Management",
+      "item": [
+        {
+          "name": "Get All Doctor Schedules",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/doctor-schedules?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "doctor-schedules"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Doctor Schedule by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/doctor-schedules/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "doctor-schedules", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Schedules by Doctor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/doctor-schedules/doctor/12",
+              "host": ["{{base_url}}"],
+              "path": ["api", "doctor-schedules", "doctor", "12"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Doctor Schedule",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctorId\": 12,\n  \"dayOfWeek\": 1,\n  \"startTime\": \"08:00:00\",\n  \"endTime\": \"17:00:00\",\n  \"breakStart\": \"12:00:00\",\n  \"breakEnd\": \"13:00:00\",\n  \"isAvailable\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/doctor-schedules",
+              "host": ["{{base_url}}"],
+              "path": ["api", "doctor-schedules"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Doctor Schedule",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctorId\": 12,\n  \"dayOfWeek\": 1,\n  \"startTime\": \"09:00:00\",\n  \"endTime\": \"18:00:00\",\n  \"breakStart\": \"13:00:00\",\n  \"breakEnd\": \"14:00:00\",\n  \"isAvailable\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/doctor-schedules/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "doctor-schedules", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Doctor Schedule",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/doctor-schedules/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "doctor-schedules", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Appointment Type Management",
+      "item": [
+        {
+          "name": "Get All Appointment Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/appointment-types",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointment-types"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Appointment Type by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/appointment-types/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointment-types", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Appointment Type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"LASIK_CONSULTATION\",\n  \"description\": \"LASIK surgery consultation\",\n  \"defaultDuration\": 60,\n  \"defaultCost\": 150000,\n  \"requiresInsurance\": true,\n  \"requiresPrepayment\": true,\n  \"requiresConsultation\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/appointment-types",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointment-types"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Appointment Type",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"LASIK_CONSULTATION\",\n  \"description\": \"Updated LASIK surgery consultation\",\n  \"defaultDuration\": 90,\n  \"defaultCost\": 180000,\n  \"requiresInsurance\": true,\n  \"requiresPrepayment\": true,\n  \"requiresConsultation\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/appointment-types/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointment-types", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Appointment Type",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/appointment-types/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "appointment-types", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Finance Management",
+      "item": [
+        {
+          "name": "Get All Invoices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/finance/invoices?page=0&size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "invoices"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Invoice by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/finance/invoices/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "invoices", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate Invoice for Appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointmentId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/finance/invoices/generate/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "invoices", "generate", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Record Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/finance/invoices/1/payment?amount=50000&method=CASH&reference=PAY-001",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "invoices", "1", "payment"],
+              "query": [
+                {
+                  "key": "amount",
+                  "value": "50000"
+                },
+                {
+                  "key": "method",
+                  "value": "CASH"
+                },
+                {
+                  "key": "reference",
+                  "value": "PAY-001"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Financial Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/finance/summary?startDate=2025-08-01&endDate=2025-08-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-08-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-08-31"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Invoice with Patient and Items",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": 1,\n  \"appointmentId\": 3,\n  \"invoiceDate\": \"2025-01-27\",\n  \"dueDate\": \"2025-02-26\",\n  \"taxAmount\": 0.00,\n  \"discountAmount\": 0.00,\n  \"notes\": \"Invoice created for patient consultation\",\n  \"internalNotes\": \"Internal notes for accounting\",\n  \"insuranceProvider\": \"Insurance Co\",\n  \"insuranceNumber\": \"INS123456\",\n  \"insuranceCoverage\": 80.00,\n  \"invoiceItems\": [\n    {\n      \"itemName\": \"Eye Consultation\",\n      \"itemDescription\": \"Comprehensive eye examination\",\n      \"itemType\": \"CONSULTATION\",\n      \"quantity\": 1,\n      \"unitPrice\": 50.00,\n      \"discountPercentage\": 0.00,\n      \"taxPercentage\": 0.00,\n      \"insuranceCovered\": false,\n      \"insuranceCoveragePercentage\": 0.00,\n      \"notes\": \"Standard consultation fee\"\n    },\n    {\n      \"itemName\": \"Glasses Fitting\",\n      \"itemDescription\": \"Professional glasses fitting service\",\n      \"itemType\": \"PROCEDURE\",\n      \"quantity\": 1,\n      \"unitPrice\": 25.00,\n      \"discountPercentage\": 0.00,\n      \"taxPercentage\": 0.00,\n      \"insuranceCovered\": false,\n      \"insuranceCoveragePercentage\": 0.00,\n      \"notes\": \"Glasses fitting service\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/finance/invoices/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "invoices", "create"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Invoice with Inventory Items",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": 1,\n  \"invoiceDate\": \"2025-01-27\",\n  \"dueDate\": \"2025-02-26\",\n  \"taxAmount\": 0.00,\n  \"discountAmount\": 0.00,\n  \"notes\": \"Invoice created with inventory items\",\n  \"internalNotes\": \"Test invoice with inventory integration\",\n  \"insuranceProvider\": \"Test Insurance\",\n  \"insuranceNumber\": \"INS123456\",\n  \"insuranceCoverage\": 80.00,\n  \"invoiceItems\": [\n    {\n      \"itemName\": \"Eye Drops - Artificial Tears\",\n      \"itemDescription\": \"Lubricating eye drops for dry eyes\",\n      \"itemType\": \"INVENTORY_ITEM\",\n      \"quantity\": 2,\n      \"unitPrice\": 15.99,\n      \"discountPercentage\": 0.00,\n      \"taxPercentage\": 0.00,\n      \"insuranceCovered\": false,\n      \"insuranceCoveragePercentage\": 0.00,\n      \"notes\": \"Inventory item from stock\",\n      \"inventoryItemId\": 1,\n      \"sku\": \"ED-AT-001\"\n    },\n    {\n      \"itemName\": \"Contact Lens Solution\",\n      \"itemDescription\": \"Multi-purpose contact lens cleaning solution\",\n      \"itemType\": \"INVENTORY_ITEM\",\n      \"quantity\": 1,\n      \"unitPrice\": 12.99,\n      \"discountPercentage\": 0.00,\n      \"taxPercentage\": 0.00,\n      \"insuranceCovered\": false,\n      \"insuranceCoveragePercentage\": 0.00,\n      \"notes\": \"Inventory item from stock\",\n      \"inventoryItemId\": 2,\n      \"sku\": \"CLS-MP-001\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/finance/invoices/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "invoices", "create"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Inventory Management",
+      "item": [
+        {
+          "name": "Create Inventory Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Category\",\n  \"description\": \"Test category for API testing\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/inventory/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "categories"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/categories?page=0&size=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "categories"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/categories/active",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "categories", "active"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/categories/search?name=Test",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "categories", "search"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Test"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Inventory Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Item\",\n  \"description\": \"Test inventory item for API testing\",\n  \"sku\": \"TEST-001\",\n  \"unitPrice\": 25.99,\n  \"costPrice\": 15.50,\n  \"quantityInStock\": 100,\n  \"minimumStockLevel\": 10,\n  \"maximumStockLevel\": 200,\n  \"unitOfMeasure\": \"units\",\n  \"categoryId\": 1,\n  \"supplierName\": \"Test Supplier\",\n  \"supplierContact\": \"test@supplier.com\",\n  \"reorderPoint\": 15,\n  \"reorderQuantity\": 50\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/inventory/items",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "items"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/items?page=0&size=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "items"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/items/active",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "items", "active"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Items by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/items/category/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "items", "category", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Low Stock Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/items/low-stock",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "items", "low-stock"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Items by Name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/items/search/name?name=Test",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "items", "search", "name"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Test"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Stock Quantity",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/inventory/items/1/stock?quantity=150",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "items", "1", "stock"],
+              "query": [
+                {
+                  "key": "quantity",
+                  "value": "150"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Available Items for Invoice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/inventory/items/available-for-invoice",
+              "host": ["{{base_url}}"],
+              "path": ["api", "inventory", "items", "available-for-invoice"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+} 

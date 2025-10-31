@@ -1,0 +1,55 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Documentation
+README*
+*.md
+
+# Test files
+src/test/
+**/test/
+**/tests/
+
+# Build artifacts
+target/
+build/
+*.jar
+*.war
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Node modules (if any)
+node_modules/
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+maven-settings.xml
+
+# Spring Boot
+application-*.yml
+application-*.properties 

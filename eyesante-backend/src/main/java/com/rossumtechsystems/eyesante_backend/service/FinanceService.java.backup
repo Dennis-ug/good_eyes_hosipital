@@ -1,0 +1,469 @@
+package com.rossumtechsystems.eyesante_backend.service;
+
+import com.rossumtechsystems.eyesante_backend.dto.InvoiceDto;
+import com.rossumtechsystems.eyesante_backend.dto.InvoiceItemDto;
+import com.rossumtechsystems.eyesante_backend.entity.*;
+import com.rossumtechsystems.eyesante_backend.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional
+public class FinanceService {
+
+    @Autowired
+    private InvoiceRepository invoiceRepository;
+
+    @Autowired
+    private InvoiceItemRepository invoiceItemRepository;
+
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AppointmentTypeRepository appointmentTypeRepository;
+
+    private static final DateTimeFormatter INVOICE_NUMBER_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+    /**
+     * Automatically generate invoice for a completed appointment
+     */
+    public InvoiceDto generateInvoiceForAppointment(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found with ID: " + appointmentId));
+
+        // Check if invoice already exists for this appointment
+        Optional<Invoice> existingInvoice = invoiceRepository.findByAppointmentId(appointmentId);
+        if (existingInvoice.isPresent()) {
+            throw new RuntimeException("Invoice already exists for appointment ID: " + appointmentId);
+        }
+
+        // Create invoice
+        Invoice invoice = new Invoice();
+        invoice.setInvoiceNumber(generateInvoiceNumber());
+        invoice.setInvoiceDate(LocalDate.now());
+        invoice.setPatient(appointment.getPatient());
+        invoice.setPatientName(appointment.getPatientName());
+        invoice.setPatientPhone(appointment.getPatientPhone());
+        invoice.setPatientEmail(appointment.getPatientEmail());
+        invoice.setDoctor(appointment.getDoctor());
+        invoice.setDoctorName(appointment.getDoctorName());
+        invoice.setDoctorSpecialty(appointment.getDoctorSpecialty());
+        invoice.setAppointment(appointment);
+        invoice.setInsuranceProvider(appointment.getInsuranceProvider());
+        invoice.setInsuranceNumber(appointment.getInsuranceNumber());
+        invoice.setNotes("Auto-generated invoice for appointment");
+
+        // Create invoice item for consultation
+        InvoiceItem consultationItem = createConsultationItem(invoice, appointment);
+        invoice.setInvoiceItems(List.of(consultationItem));
+
+        // Calculate totals
+        invoice.calculateTotals();
+
+        // Save invoice
+        Invoice savedInvoice = invoiceRepository.save(invoice);
+        invoiceItemRepository.save(consultationItem);
+
+        return convertToDto(savedInvoice);
+    }
+
+    /**
+     * Create consultation invoice item based on appointment type
+     */
+    private InvoiceItem createConsultationItem(Invoice invoice, Appointment appointment) {
+        InvoiceItem item = new InvoiceItem();
+        item.setInvoice(invoice);
+        item.setItemName("Consultation - " + appointment.getAppointmentType().name().replace("_", " "));
+        item.setItemDescription("Medical consultation for " + appointment.getReason());
+        item.setItemType("CONSULTATION");
+        item.setQuantity(1);
+
+        // Get price from appointment type or use appointment cost
+        BigDecimal unitPrice;
+        if (appointment.getCost() != null) {
+            unitPrice = appointment.getCost();
+        } else {
+            // Get default cost from appointment type
+            AppointmentType appointmentType = appointmentTypeRepository.findByName(appointment.getAppointmentType().name())
+                    .orElseThrow(() -> new RuntimeException("Appointment type not found: " + appointment.getAppointmentType()));
+            unitPrice = appointmentType.getDefaultCost();
+        }
+
+        item.setUnitPrice(unitPrice);
+        item.setTaxPercentage(new BigDecimal("18.00")); // 18% VAT
+        item.setInsuranceCovered(appointment.getInsuranceProvider() != null);
+        
+        if (item.getInsuranceCovered()) {
+            item.setInsuranceCoveragePercentage(new BigDecimal("80.00")); // 80% insurance coverage
+        }
+
+        item.calculateTotals();
+        return item;
+    }
+
+    /**
+     * Generate unique invoice number
+     */
+    private String generateInvoiceNumber() {
+        String datePrefix = LocalDate.now().format(INVOICE_NUMBER_FORMAT);
+        String baseNumber = "INV-" + datePrefix + "-";
+        
+        // Find the next sequence number for today
+        int sequence = 1;
+        String invoiceNumber = baseNumber + String.format("%04d", sequence);
+        
+        while (invoiceRepository.existsByInvoiceNumber(invoiceNumber)) {
+            sequence++;
+            invoiceNumber = baseNumber + String.format("%04d", sequence);
+        }
+        
+        return invoiceNumber;
+    }
+
+    /**
+     * Create invoice with patient and invoice items
+     */
+    public InvoiceDto createInvoiceWithItems(CreateInvoiceRequest request) {
+        // Validate patient exists
+        Patient patient = patientRepository.findById(request.getPatientId())
+                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + request.getPatientId()));
+        
+        // Validate doctor exists
+        User doctor = userRepository.findById(request.getDoctorId())
+                .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + request.getDoctorId()));
+        
+        // Validate appointment if provided
+        Appointment appointment = null;
+        if (request.getAppointmentId() != null) {
+            appointment = appointmentRepository.findById(request.getAppointmentId())
+                    .orElseThrow(() -> new RuntimeException("Appointment not found with ID: " + request.getAppointmentId()));
+        }
+        
+        // Create invoice
+        Invoice invoice = new Invoice();
+        invoice.setInvoiceNumber(generateInvoiceNumber());
+        invoice.setInvoiceDate(request.getInvoiceDate());
+        invoice.setDueDate(request.getDueDate());
+        
+        // Set patient information
+        invoice.setPatient(patient);
+        invoice.setPatientName(patient.getFirstName() + " " + patient.getLastName());
+        invoice.setPatientPhone(patient.getPhone());
+        invoice.setPatientEmail(patient.getEmail());
+        
+        // Set doctor information
+        invoice.setDoctor(doctor);
+        invoice.setDoctorName(doctor.getFirstName() + " " + doctor.getLastName());
+        invoice.setDoctorSpecialty(doctor.getSpecialty());
+        
+        // Set appointment if provided
+        invoice.setAppointment(appointment);
+        
+        // Set financial information
+        invoice.setTaxAmount(request.getTaxAmount());
+        invoice.setDiscountAmount(request.getDiscountAmount());
+        invoice.setNotes(request.getNotes());
+        invoice.setInternalNotes(request.getInternalNotes());
+        
+        // Set insurance information
+        invoice.setInsuranceProvider(request.getInsuranceProvider());
+        invoice.setInsuranceNumber(request.getInsuranceNumber());
+        invoice.setInsuranceCoverage(request.getInsuranceCoverage());
+        
+        // Create invoice items
+        List<InvoiceItem> invoiceItems = request.getInvoiceItems().stream()
+                .map(itemRequest -> createInvoiceItem(invoice, itemRequest))
+                .collect(Collectors.toList());
+        
+        invoice.setInvoiceItems(invoiceItems);
+        
+        // Calculate totals
+        invoice.calculateTotals();
+        
+        // Save invoice and items
+        Invoice savedInvoice = invoiceRepository.save(invoice);
+        invoiceItemRepository.saveAll(invoiceItems);
+        
+        return convertToDto(savedInvoice);
+    }
+    
+    /**
+     * Create invoice item from request
+     */
+    private InvoiceItem createInvoiceItem(Invoice invoice, CreateInvoiceRequest.CreateInvoiceItemRequest itemRequest) {
+        InvoiceItem item = new InvoiceItem();
+        item.setInvoice(invoice);
+        item.setItemName(itemRequest.getItemName());
+        item.setItemDescription(itemRequest.getItemDescription());
+        item.setItemType(itemRequest.getItemType());
+        item.setQuantity(itemRequest.getQuantity());
+        item.setUnitPrice(itemRequest.getUnitPrice());
+        item.setDiscountPercentage(itemRequest.getDiscountPercentage());
+        item.setTaxPercentage(itemRequest.getTaxPercentage());
+        item.setInsuranceCovered(itemRequest.getInsuranceCovered());
+        item.setInsuranceCoveragePercentage(itemRequest.getInsuranceCoveragePercentage());
+        item.setNotes(itemRequest.getNotes());
+        
+        // Calculate totals
+        item.calculateTotals();
+        
+        return item;
+    }
+
+    /**
+     * Get invoice by ID
+     */
+    public InvoiceDto getInvoiceById(Long id) {
+        Invoice invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Invoice not found with ID: " + id));
+        return convertToDto(invoice);
+    }
+
+    /**
+     * Get invoice by invoice number
+     */
+    public InvoiceDto getInvoiceByNumber(String invoiceNumber) {
+        Invoice invoice = invoiceRepository.findByInvoiceNumber(invoiceNumber)
+                .orElseThrow(() -> new RuntimeException("Invoice not found with number: " + invoiceNumber));
+        return convertToDto(invoice);
+    }
+
+    /**
+     * Get all invoices with pagination
+     */
+    public Page<InvoiceDto> getAllInvoices(Pageable pageable) {
+        return invoiceRepository.findAll(pageable).map(this::convertToDto);
+    }
+
+    /**
+     * Get invoices by patient
+     */
+    public Page<InvoiceDto> getInvoicesByPatient(Long patientId, Pageable pageable) {
+        return invoiceRepository.findByPatientIdOrderByInvoiceDateDesc(patientId, pageable).map(this::convertToDto);
+    }
+
+    /**
+     * Get invoices by doctor
+     */
+    public Page<InvoiceDto> getInvoicesByDoctor(Long doctorId, Pageable pageable) {
+        return invoiceRepository.findByDoctorIdOrderByInvoiceDateDesc(doctorId, pageable).map(this::convertToDto);
+    }
+
+    /**
+     * Get invoices by status
+     */
+    public Page<InvoiceDto> getInvoicesByStatus(Invoice.InvoiceStatus status, Pageable pageable) {
+        return invoiceRepository.findByStatusOrderByInvoiceDateDesc(status, pageable).map(this::convertToDto);
+    }
+
+    /**
+     * Get invoices by payment status
+     */
+    public Page<InvoiceDto> getInvoicesByPaymentStatus(Invoice.PaymentStatus paymentStatus, Pageable pageable) {
+        return invoiceRepository.findByPaymentStatusOrderByInvoiceDateDesc(paymentStatus, pageable).map(this::convertToDto);
+    }
+
+    /**
+     * Get invoices by date range
+     */
+    public Page<InvoiceDto> getInvoicesByDateRange(LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        return invoiceRepository.findByInvoiceDateBetweenOrderByInvoiceDateDesc(startDate, endDate, pageable).map(this::convertToDto);
+    }
+
+    /**
+     * Get overdue invoices
+     */
+    public List<InvoiceDto> getOverdueInvoices() {
+        return invoiceRepository.findOverdueInvoices(LocalDate.now())
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get invoices with balance due
+     */
+    public Page<InvoiceDto> getInvoicesWithBalanceDue(Pageable pageable) {
+        return invoiceRepository.findInvoicesWithBalanceDue(pageable).map(this::convertToDto);
+    }
+
+    /**
+     * Record payment for an invoice
+     */
+    public InvoiceDto recordPayment(Long invoiceId, BigDecimal amount, Invoice.PaymentMethod method, String reference) {
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new RuntimeException("Invoice not found with ID: " + invoiceId));
+
+        invoice.addPayment(amount, method, reference);
+        Invoice savedInvoice = invoiceRepository.save(invoice);
+
+        return convertToDto(savedInvoice);
+    }
+
+    /**
+     * Update invoice status
+     */
+    public InvoiceDto updateInvoiceStatus(Long invoiceId, Invoice.InvoiceStatus status) {
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new RuntimeException("Invoice not found with ID: " + invoiceId));
+
+        invoice.setStatus(status);
+        Invoice savedInvoice = invoiceRepository.save(invoice);
+
+        return convertToDto(savedInvoice);
+    }
+
+    /**
+     * Get financial summary for a date range
+     */
+    public FinancialSummaryDto getFinancialSummary(LocalDate startDate, LocalDate endDate) {
+        BigDecimal totalRevenue = invoiceRepository.calculateTotalRevenue(startDate, endDate);
+        BigDecimal outstandingBalance = invoiceRepository.calculateOutstandingBalance(startDate, endDate);
+        
+        if (totalRevenue == null) totalRevenue = BigDecimal.ZERO;
+        if (outstandingBalance == null) outstandingBalance = BigDecimal.ZERO;
+
+        return new FinancialSummaryDto(startDate, endDate, totalRevenue, outstandingBalance);
+    }
+
+    /**
+     * Convert Invoice entity to DTO
+     */
+    private InvoiceDto convertToDto(Invoice invoice) {
+        InvoiceDto dto = new InvoiceDto();
+        dto.setId(invoice.getId());
+        dto.setInvoiceNumber(invoice.getInvoiceNumber());
+        dto.setInvoiceDate(invoice.getInvoiceDate());
+        dto.setDueDate(invoice.getDueDate());
+        
+        // Patient information
+        dto.setPatientId(invoice.getPatient().getId());
+        dto.setPatientName(invoice.getPatientName());
+        dto.setPatientPhone(invoice.getPatientPhone());
+        dto.setPatientEmail(invoice.getPatientEmail());
+        
+        // Doctor information
+        dto.setDoctorId(invoice.getDoctor().getId());
+        dto.setDoctorName(invoice.getDoctorName());
+        dto.setDoctorSpecialty(invoice.getDoctorSpecialty());
+        
+        // Appointment information
+        if (invoice.getAppointment() != null) {
+            dto.setAppointmentId(invoice.getAppointment().getId());
+        }
+        
+        // Financial information
+        dto.setSubtotal(invoice.getSubtotal());
+        dto.setTaxAmount(invoice.getTaxAmount());
+        dto.setDiscountAmount(invoice.getDiscountAmount());
+        dto.setTotalAmount(invoice.getTotalAmount());
+        dto.setAmountPaid(invoice.getAmountPaid());
+        dto.setBalanceDue(invoice.getBalanceDue());
+        
+        // Status information
+        dto.setStatus(invoice.getStatus());
+        dto.setPaymentStatus(invoice.getPaymentStatus());
+        
+        // Payment information
+        dto.setPaymentMethod(invoice.getPaymentMethod());
+        dto.setPaymentReference(invoice.getPaymentReference());
+        dto.setPaymentDate(invoice.getPaymentDate());
+        
+        // Insurance information
+        dto.setInsuranceProvider(invoice.getInsuranceProvider());
+        dto.setInsuranceNumber(invoice.getInsuranceNumber());
+        dto.setInsuranceCoverage(invoice.getInsuranceCoverage());
+        dto.setInsuranceAmount(invoice.getInsuranceAmount());
+        
+        // Notes
+        dto.setNotes(invoice.getNotes());
+        dto.setInternalNotes(invoice.getInternalNotes());
+        
+        // Invoice items
+        if (invoice.getInvoiceItems() != null) {
+            dto.setInvoiceItems(invoice.getInvoiceItems().stream()
+                    .map(this::convertItemToDto)
+                    .collect(Collectors.toList()));
+        }
+        
+        // Audit information
+        dto.setCreatedAt(invoice.getCreatedAt());
+        dto.setUpdatedAt(invoice.getUpdatedAt());
+        dto.setCreatedBy(invoice.getCreatedBy());
+        dto.setUpdatedBy(invoice.getUpdatedBy());
+        
+        return dto;
+    }
+
+    /**
+     * Convert InvoiceItem entity to DTO
+     */
+    private InvoiceItemDto convertItemToDto(InvoiceItem item) {
+        InvoiceItemDto dto = new InvoiceItemDto();
+        dto.setId(item.getId());
+        dto.setInvoiceId(item.getInvoice().getId());
+        dto.setItemName(item.getItemName());
+        dto.setItemDescription(item.getItemDescription());
+        dto.setItemType(item.getItemType());
+        dto.setQuantity(item.getQuantity());
+        dto.setUnitPrice(item.getUnitPrice());
+        dto.setTotalPrice(item.getTotalPrice());
+        dto.setDiscountPercentage(item.getDiscountPercentage());
+        dto.setDiscountAmount(item.getDiscountAmount());
+        dto.setFinalPrice(item.getFinalPrice());
+        dto.setTaxPercentage(item.getTaxPercentage());
+        dto.setTaxAmount(item.getTaxAmount());
+        dto.setInsuranceCovered(item.getInsuranceCovered());
+        dto.setInsuranceCoveragePercentage(item.getInsuranceCoveragePercentage());
+        dto.setInsuranceAmount(item.getInsuranceAmount());
+        dto.setNotes(item.getNotes());
+        return dto;
+    }
+
+    /**
+     * Financial Summary DTO
+     */
+    public static class FinancialSummaryDto {
+        private LocalDate startDate;
+        private LocalDate endDate;
+        private BigDecimal totalRevenue;
+        private BigDecimal outstandingBalance;
+
+        public FinancialSummaryDto(LocalDate startDate, LocalDate endDate, BigDecimal totalRevenue, BigDecimal outstandingBalance) {
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.totalRevenue = totalRevenue;
+            this.outstandingBalance = outstandingBalance;
+        }
+
+        // Getters and setters
+        public LocalDate getStartDate() { return startDate; }
+        public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+
+        public LocalDate getEndDate() { return endDate; }
+        public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+
+        public BigDecimal getTotalRevenue() { return totalRevenue; }
+        public void setTotalRevenue(BigDecimal totalRevenue) { this.totalRevenue = totalRevenue; }
+
+        public BigDecimal getOutstandingBalance() { return outstandingBalance; }
+        public void setOutstandingBalance(BigDecimal outstandingBalance) { this.outstandingBalance = outstandingBalance; }
+    }
+} 

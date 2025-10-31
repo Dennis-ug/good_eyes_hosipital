@@ -1,0 +1,61 @@
+-- Create clinics table
+-- Migration V59: Create clinics table
+
+CREATE TABLE IF NOT EXISTS clinics (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    department VARCHAR(255),
+    description TEXT,
+    
+    -- Contact Information for Receipts
+    clinic_name VARCHAR(255) NOT NULL DEFAULT 'Eye Sante Clinic',
+    clinic_address TEXT DEFAULT 'Kampala, Uganda',
+    clinic_phone VARCHAR(50) DEFAULT '+256 123 456 789',
+    clinic_email VARCHAR(255),
+    clinic_website VARCHAR(255),
+    clinic_logo_text VARCHAR(100) DEFAULT 'EYE SANTE CLINIC',
+    receipt_footer_message TEXT DEFAULT 'Thank you for choosing Eye Sante Clinic',
+    receipt_contact_message VARCHAR(255) DEFAULT 'For inquiries: ',
+    
+    -- Status
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_default BOOLEAN NOT NULL DEFAULT FALSE,
+    
+    -- Audit Information
+    created_by VARCHAR(100) NOT NULL DEFAULT 'system',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by VARCHAR(100)
+);
+
+-- Add indexes for better performance
+CREATE INDEX idx_clinics_is_active ON clinics(is_active);
+CREATE INDEX idx_clinics_is_default ON clinics(is_default);
+
+-- Add comments to explain the columns
+COMMENT ON TABLE clinics IS 'Clinic configuration table for managing clinic contact information';
+COMMENT ON COLUMN clinics.clinic_name IS 'Name to display on receipts';
+COMMENT ON COLUMN clinics.clinic_address IS 'Address to display on receipts';
+COMMENT ON COLUMN clinics.clinic_phone IS 'Phone number to display on receipts';
+COMMENT ON COLUMN clinics.clinic_email IS 'Email address for clinic contact';
+COMMENT ON COLUMN clinics.clinic_website IS 'Website URL for clinic';
+COMMENT ON COLUMN clinics.clinic_logo_text IS 'Text to display as logo on receipts';
+COMMENT ON COLUMN clinics.receipt_footer_message IS 'Custom footer message for receipts';
+COMMENT ON COLUMN clinics.receipt_contact_message IS 'Contact message prefix for receipts';
+COMMENT ON COLUMN clinics.is_active IS 'Whether this clinic configuration is active';
+COMMENT ON COLUMN clinics.is_default IS 'Whether this is the default clinic for receipts';
+
+-- Insert a default clinic configuration
+INSERT INTO clinics (name, clinic_name, clinic_address, clinic_phone, clinic_logo_text, receipt_footer_message, receipt_contact_message, is_active, is_default, created_by)
+VALUES (
+    'Main Clinic',
+    'Eye Sante Clinic',
+    'Kampala, Uganda',
+    '+256 123 456 789',
+    'EYE SANTE CLINIC',
+    'Thank you for choosing Eye Sante Clinic',
+    'For inquiries: ',
+    TRUE,
+    TRUE,
+    'system'
+);

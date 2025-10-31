@@ -1,0 +1,41 @@
+{
+  "name": "isante-front-end",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "cd .. && export $(cat .env | grep -v '^#' | xargs) && cd isante-front-end && next dev",
+    "dev:env": "cd .. && export $(cat .env | grep -v '^#' | xargs) && cd isante-front-end && npm run dev",
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "build:clean": "rm -rf .next && rm -rf node_modules/.cache && next build",
+    "build:env": "cd .. && export $(cat .env | grep -v '^#' | xargs) && cd isante-front-end && next build",
+    "start": "next start",
+    "start:env": "cd .. && export $(cat .env | grep -v '^#' | xargs) && cd isante-front-end && next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.7",
+    "@heroicons/react": "^2.2.0",
+    "@hookform/resolvers": "^3.9.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "lucide-react": "^0.460.0",
+    "next": "15.4.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-hook-form": "^7.53.2",
+    "recharts": "^3.3.0",
+    "tailwind-merge": "^2.5.4",
+    "xlsx": "^0.18.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.4.4",
+    "typescript": "^5"
+  }
+}

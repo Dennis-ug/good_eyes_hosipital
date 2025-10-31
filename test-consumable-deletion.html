@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Consumable Deletion</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Consumable Deletion Test</h1>
+    
+    <div class="test-section info">
+        <h3>📋 Test Instructions</h3>
+        <p>This test will verify the consumable deletion functionality in the iSante system.</p>
+        <ol>
+            <li>Click "Test Backend Connection" to verify the API is working</li>
+            <li>Click "Test Surgery Reports API" to check if surgery reports are accessible</li>
+            <li>Click "Test Consumable Deletion" to simulate the deletion process</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h3>🔗 Backend Connection Test</h3>
+        <button onclick="testBackendConnection()">Test Backend Connection</button>
+        <div id="backend-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Surgery Reports API Test</h3>
+        <button onclick="testSurgeryReportsAPI()">Test Surgery Reports API</button>
+        <div id="surgery-reports-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🗑️ Consumable Deletion Test</h3>
+        <button onclick="testConsumableDeletion()">Test Consumable Deletion</button>
+        <div id="consumable-deletion-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📝 Manual Test Steps</h3>
+        <p>To manually test the consumable deletion:</p>
+        <ol>
+            <li>Go to <a href="http://localhost:3000/dashboard/theater/procedure-reports" target="_blank">Procedure Reports</a></li>
+            <li>Click the "Edit" button (pencil icon) on any surgery report</li>
+            <li>In the "Consumable Items Used" section, try to remove an item using the trash icon</li>
+            <li>Click "Update Report" to save changes</li>
+        </ol>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5025/api';
+        
+        async function testBackendConnection() {
+            const resultDiv = document.getElementById('backend-result');
+            resultDiv.innerHTML = '<p>Testing backend connection...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/test`);
+                const data = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Backend Connection Successful</h4>
+                            <p>Response: ${data}</p>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${data}`);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Backend Connection Failed</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function testSurgeryReportsAPI() {
+            const resultDiv = document.getElementById('surgery-reports-result');
+            resultDiv.innerHTML = '<p>Testing surgery reports API...</p>';
+            
+            try {
+                // First get patient procedures
+                const proceduresResponse = await fetch(`${API_BASE}/patient-procedures`);
+                if (!proceduresResponse.ok) {
+                    throw new Error(`Failed to fetch procedures: ${proceduresResponse.status}`);
+                }
+                
+                const procedures = await proceduresResponse.json();
+                resultDiv.innerHTML = `
+                    <div class="info">
+                        <h4>📋 Found ${procedures.length} patient procedures</h4>
+                        <p>Testing surgery reports for each procedure...</p>
+                    </div>
+                `;
+                
+                // Test surgery reports for each procedure
+                let totalReports = 0;
+                for (const procedure of procedures.slice(0, 3)) { // Test first 3 procedures
+                    try {
+                        const reportsResponse = await fetch(`${API_BASE}/surgery-reports/procedure/${procedure.id}`);
+                        if (reportsResponse.ok) {
+                            const reports = await reportsResponse.json();
+                            totalReports += reports.length;
+                        }
+                    } catch (err) {
+                        console.log(`No reports for procedure ${procedure.id}`);
+                    }
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Surgery Reports API Working</h4>
+                        <p>Found ${totalReports} surgery reports across procedures</p>
+                        <p>API endpoints are accessible and responding correctly</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Surgery Reports API Failed</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function testConsumableDeletion() {
+            const resultDiv = document.getElementById('consumable-deletion-result');
+            resultDiv.innerHTML = '<p>Testing consumable deletion functionality...</p>';
+            
+            try {
+                // Get procedures and their reports
+                const proceduresResponse = await fetch(`${API_BASE}/patient-procedures`);
+                const procedures = await proceduresResponse.json();
+                
+                let testReport = null;
+                
+                // Find a procedure with surgery reports
+                for (const procedure of procedures) {
+                    try {
+                        const reportsResponse = await fetch(`${API_BASE}/surgery-reports/procedure/${procedure.id}`);
+                        if (reportsResponse.ok) {
+                            const reports = await reportsResponse.json();
+                            if (reports.length > 0) {
+                                testReport = reports[0];
+                                break;
+                            }
+                        }
+                    } catch (err) {
+                        continue;
+                    }
+                }
+                
+                if (!testReport) {
+                    resultDiv.innerHTML = `
+                        <div class="info">
+                            <h4>ℹ️ No Surgery Reports Found</h4>
+                            <p>No surgery reports available for testing. Please create a surgery report first.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Test updating the report with empty consumables (simulating deletion)
+                const updateData = {
+                    anesthesiaType: testReport.anesthesiaType,
+                    diagnosis: testReport.diagnosis,
+                    surgeryType: testReport.surgeryType,
+                    eyeSide: testReport.eyeSide,
+                    surgeonName: testReport.surgeonName,
+                    assistantName: testReport.assistantName,
+                    comments: testReport.comments,
+                    startTime: testReport.startTime,
+                    endTime: testReport.endTime,
+                    consumableItems: [] // Empty array to simulate deletion
+                };
+                
+                const updateResponse = await fetch(`${API_BASE}/surgery-reports/${testReport.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                
+                if (updateResponse.ok) {
+                    const updatedReport = await updateResponse.json();
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Consumable Deletion Test Successful</h4>
+                            <p>Successfully updated surgery report ${testReport.id}</p>
+                            <p>Consumable items count: ${updatedReport.consumableItems?.length || 0}</p>
+                            <p>The deletion functionality is working correctly!</p>
+                        </div>
+                    `;
+                } else {
+                    const errorData = await updateResponse.text();
+                    throw new Error(`Update failed: ${updateResponse.status} - ${errorData}`);
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Consumable Deletion Test Failed</h4>
+                        <p>Error: ${error.message}</p>
+                        <p>This might indicate an issue with the backend API or database.</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

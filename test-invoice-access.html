@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Invoice Access</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Test Invoice Access</h1>
+    
+    <div class="test-section info">
+        <h3>Instructions</h3>
+        <p>This page helps test if the invoice access is working. Make sure you're logged into the main application first.</p>
+        <p><strong>Current Backend URL:</strong> http://localhost:5025</p>
+        <p><strong>Main Invoices Page:</strong> <a href="http://localhost:3000/dashboard/finance/invoices" target="_blank">http://localhost:3000/dashboard/finance/invoices</a></p>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 1: Check Backend Status</h3>
+        <button onclick="testBackend()">Test Backend Connection</button>
+        <div id="backend-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Check Authentication</h3>
+        <p>Make sure you're logged into the main application, then click the button below.</p>
+        <button onclick="testAuth()">Test Authentication</button>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Direct Links</h3>
+        <p>Try these direct links to access invoices:</p>
+        <ul>
+            <li><a href="http://localhost:3000/dashboard/finance/invoices" target="_blank">All Invoices Page</a></li>
+            <li><a href="http://localhost:3000/dashboard/finance" target="_blank">Finance Dashboard</a></li>
+            <li><a href="http://localhost:3000/dashboard/patient-visit-sessions/13/procedures" target="_blank">Procedures Page (to create invoice)</a></li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 4: Create Test Invoice</h3>
+        <p>Follow these steps to create a test invoice:</p>
+        <ol>
+            <li>Go to <a href="http://localhost:3000/dashboard/patient-visit-sessions/13/procedures" target="_blank">Procedures Page</a></li>
+            <li>Click "Add Demo Procedures" (yellow button)</li>
+            <li>Click "Create Invoice" (blue button)</li>
+            <li>Go to <a href="http://localhost:3000/dashboard/finance/invoices" target="_blank">All Invoices Page</a> to see if it appears</li>
+        </ol>
+    </div>
+
+    <script>
+        async function testBackend() {
+            const resultDiv = document.getElementById('backend-result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:5025/api/health');
+                const data = await response.text();
+                
+                if (response.status === 401) {
+                    resultDiv.innerHTML = '<div class="success"><p>✅ Backend is running! (401 is expected - needs authentication)</p><pre>' + data + '</pre></div>';
+                } else if (response.ok) {
+                    resultDiv.innerHTML = '<div class="success"><p>✅ Backend is running!</p><pre>' + data + '</pre></div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="error"><p>❌ Backend error: ' + response.status + '</p><pre>' + data + '</pre></div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error"><p>❌ Backend connection failed: ' + error.message + '</p></div>';
+            }
+        }
+
+        async function testAuth() {
+            const resultDiv = document.getElementById('auth-result');
+            resultDiv.innerHTML = '<p>Testing authentication...</p>';
+            
+            try {
+                // Try to access the invoices endpoint
+                const response = await fetch('http://localhost:5025/api/finance/invoices?page=0&size=5', {
+                    credentials: 'include'
+                });
+                const data = await response.text();
+                
+                if (response.status === 401) {
+                    resultDiv.innerHTML = '<div class="error"><p>❌ Not authenticated. Please log into the main application first.</p><p><a href="http://localhost:3000/login" target="_blank">Go to Login</a></p></div>';
+                } else if (response.ok) {
+                    resultDiv.innerHTML = '<div class="success"><p>✅ Authentication successful! You can access invoices.</p><pre>' + data + '</pre></div>';
+                } else {
+                    resultDiv.innerHTML = '<div class="error"><p>❌ Error: ' + response.status + '</p><pre>' + data + '</pre></div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="error"><p>❌ Request failed: ' + error.message + '</p></div>';
+            }
+        }
+
+        // Auto-test backend on page load
+        window.onload = function() {
+            testBackend();
+        };
+    </script>
+</body>
+</html>

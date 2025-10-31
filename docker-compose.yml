@@ -1,0 +1,110 @@
+version: '3.3'
+
+services:
+  # PostgreSQL Database for iSante
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: isante-postgres
+  #   environment:
+  #     POSTGRES_DB: eyesante_db
+  #     POSTGRES_USER: eyesante_admin
+  #     POSTGRES_PASSWORD: eyesante_admin_password
+  #   # ports:
+  #   #   - "5432:5432"
+  #   volumes:
+  #     - isante_postgres_data:/var/lib/postgresql/data
+  #     - isante_backup_data:/backups
+  #     - ./eyesante-backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   networks:
+  #     - main_host
+
+  #   restart: unless-stopped
+
+  # Spring Boot Backend Application
+  backend:
+    build:
+      context: ./eyesante-backend 
+      dockerfile: Dockerfile
+    container_name: isante-backend
+    env_file:
+      - .env
+    ports:
+      - "5025:5025"
+    # depends_on:
+    #   - postgres
+    networks:
+      - main_host
+      
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`isante-api.rossumtechsystems.com`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.routers.backend.tls.certresolver=production"
+      - "traefik.http.routers.backend.middlewares=rate-limit@file"
+
+  # Next.js Frontend Application
+  frontend:
+    build:
+      context: .
+      dockerfile: ./isante-front-end/Dockerfile
+    container_name: isante-frontend
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - main_host
+    restart: unless-stopped
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`isante-demo.rossumtechsystems.com`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.routers.frontend.tls.certresolver=production"
+      - "traefik.http.routers.frontend.middlewares=rate-limit@file"
+
+  # pgAdmin - Database Management Interface for iSante
+  # isante-pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: isante-pgadmin
+  #   ports:
+  #     - "5050:80"
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@eyesante.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin123
+  #     PGADMIN_CONFIG_SERVER_MODE: 'False'
+  #     PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+  #     # Auto-configure database connection
+  #     PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+  #     # Server configuration via environment variables
+  #     PGADMIN_CONFIG_SERVERS_JSON: '{"Servers":{"1":{"Name":"iSante PostgreSQL","Group":"Servers","Host":"postgres","Port":5432,"MaintenanceDB":"eyesante_db","Username":"eyesante_admin","Password":"eyesante_admin_password","SSLMode":"prefer"}}}'
+  #   volumes:
+  #     - isante_pgadmin_data:/var/lib/pgadmin
+  #     - ./pgadmin-servers.json:/pgadmin4/servers.json
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - main_host
+  #   restart: unless-stopped
+
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.isante-pgadmin.rule=Host(`isante-pgadmin.rossumtechsystems.com`)"
+  #     - "traefik.http.routers.isante-pgadmin.entrypoints=websecure"
+  #     - "traefik.http.routers.isante-pgadmin.tls=true"
+  #     - "traefik.http.routers.isante-pgadmin.tls.certresolver=production"
+
+volumes:
+  isante_postgres_data:
+  isante_pgadmin_data:
+  isante_backup_data:
+
+
+networks:
+  main_host:
+    external: true

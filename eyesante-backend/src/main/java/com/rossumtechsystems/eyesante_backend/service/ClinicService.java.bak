@@ -1,0 +1,147 @@
+package com.rossumtechsystems.eyesante_backend.service;
+
+import com.rossumtechsystems.eyesante_backend.dto.ClinicDto;
+import com.rossumtechsystems.eyesante_backend.entity.Clinic;
+import com.rossumtechsystems.eyesante_backend.repository.ClinicRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+@Service
+@Transactional
+public class ClinicService {
+
+    @Autowired
+    private ClinicRepository clinicRepository;
+
+    /**
+     * Get the default clinic configuration for receipts
+     */
+    public ClinicDto getDefaultClinic() {
+        Optional<Clinic> defaultClinic = clinicRepository.findByIsActiveTrueAndIsDefaultTrue();
+        
+        if (defaultClinic.isPresent()) {
+            return toDto(defaultClinic.get());
+        }
+        
+        // If no default clinic, get the first active clinic
+        Optional<Clinic> firstActiveClinic = clinicRepository.findFirstByIsActiveTrue();
+        
+        if (firstActiveClinic.isPresent()) {
+            return toDto(firstActiveClinic.get());
+        }
+        
+        // Return default values if no clinic is configured
+        return getDefaultClinicDto();
+    }
+
+    /**
+     * Get clinic by ID
+     */
+    public ClinicDto getClinicById(Long id) {
+        Clinic clinic = clinicRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Clinic not found with ID: " + id));
+        return toDto(clinic);
+    }
+
+    /**
+     * Create or update clinic configuration
+     */
+    public ClinicDto saveClinic(ClinicDto clinicDto) {
+        Clinic clinic;
+        
+        if (clinicDto.getId() != null) {
+            clinic = clinicRepository.findById(clinicDto.getId())
+                    .orElseThrow(() -> new RuntimeException("Clinic not found with ID: " + clinicDto.getId()));
+        } else {
+            clinic = new Clinic();
+        }
+        
+        // Update clinic fields
+        clinic.setName(clinicDto.getName());
+        clinic.setDepartment(clinicDto.getDepartment());
+        clinic.setDescription(clinicDto.getDescription());
+        clinic.setClinicName(clinicDto.getClinicName());
+        clinic.setClinicAddress(clinicDto.getClinicAddress());
+        clinic.setClinicPhone(clinicDto.getClinicPhone());
+        clinic.setClinicEmail(clinicDto.getClinicEmail());
+        clinic.setClinicWebsite(clinicDto.getClinicWebsite());
+        clinic.setClinicLogoText(clinicDto.getClinicLogoText());
+        clinic.setReceiptFooterMessage(clinicDto.getReceiptFooterMessage());
+        clinic.setReceiptContactMessage(clinicDto.getReceiptContactMessage());
+        clinic.setIsActive(clinicDto.getIsActive());
+        clinic.setIsDefault(clinicDto.getIsDefault());
+        
+        // If this clinic is being set as default, unset other defaults
+        if (clinicDto.getIsDefault() != null && clinicDto.getIsDefault()) {
+            clinicRepository.findAll().forEach(c -> {
+                if (!c.getId().equals(clinic.getId())) {
+                    c.setIsDefault(false);
+                    clinicRepository.save(c);
+                }
+            });
+        }
+        
+        Clinic savedClinic = clinicRepository.save(clinic);
+        return toDto(savedClinic);
+    }
+
+    /**
+     * Set a clinic as default
+     */
+    public ClinicDto setDefaultClinic(Long clinicId) {
+        // Unset all other defaults
+        clinicRepository.findAll().forEach(clinic -> {
+            clinic.setIsDefault(false);
+            clinicRepository.save(clinic);
+        });
+        
+        // Set the specified clinic as default
+        Clinic clinic = clinicRepository.findById(clinicId)
+                .orElseThrow(() -> new RuntimeException("Clinic not found with ID: " + clinicId));
+        clinic.setIsDefault(true);
+        
+        Clinic savedClinic = clinicRepository.save(clinic);
+        return toDto(savedClinic);
+    }
+
+    /**
+     * Convert entity to DTO
+     */
+    private ClinicDto toDto(Clinic clinic) {
+        ClinicDto dto = new ClinicDto();
+        dto.setId(clinic.getId());
+        dto.setName(clinic.getName());
+        dto.setDepartment(clinic.getDepartment());
+        dto.setDescription(clinic.getDescription());
+        dto.setClinicName(clinic.getClinicName());
+        dto.setClinicAddress(clinic.getClinicAddress());
+        dto.setClinicPhone(clinic.getClinicPhone());
+        dto.setClinicEmail(clinic.getClinicEmail());
+        dto.setClinicWebsite(clinic.getClinicWebsite());
+        dto.setClinicLogoText(clinic.getClinicLogoText());
+        dto.setReceiptFooterMessage(clinic.getReceiptFooterMessage());
+        dto.setReceiptContactMessage(clinic.getReceiptContactMessage());
+        dto.setIsActive(clinic.getIsActive());
+        dto.setIsDefault(clinic.getIsDefault());
+        return dto;
+    }
+
+    /**
+     * Get default clinic DTO with fallback values
+     */
+    private ClinicDto getDefaultClinicDto() {
+        ClinicDto dto = new ClinicDto();
+        dto.setClinicName("Eye Sante Clinic");
+        dto.setClinicAddress("Kampala, Uganda");
+        dto.setClinicPhone("+256 123 456 789");
+        dto.setClinicLogoText("EYE SANTE CLINIC");
+        dto.setReceiptFooterMessage("Thank you for choosing Eye Sante Clinic");
+        dto.setReceiptContactMessage("For inquiries: ");
+        dto.setIsActive(true);
+        dto.setIsDefault(true);
+        return dto;
+    }
+}

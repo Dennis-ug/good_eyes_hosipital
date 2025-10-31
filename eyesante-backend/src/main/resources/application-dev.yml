@@ -1,0 +1,53 @@
+spring:
+  # Development-specific optimizations
+  jpa:
+    hibernate:
+      ddl-auto: none  # Let Flyway handle schema in development too
+    defer-datasource-initialization: false  # Disable to prevent circular dependency
+    properties:
+      hibernate:
+        # Use update mode for development
+        hbm2ddl:
+          auto: none  # Let Flyway handle schema
+        # Optimize for development
+        jdbc:
+          batch_size: 20
+          fetch_size: 20
+        # Disable statistics for faster startup
+        generate_statistics: false
+        # Optimize connection pool
+        connection:
+          provider_disables_autocommit: true
+        # Disable second-level cache for faster startup
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+  
+  # Development database migration settings
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    validate-on-migrate: false  # Disable validation to prevent circular dependency
+    locations: classpath:db/migration
+    batch: true
+    clean-disabled: false  # Allow clean in development
+    # Use data.sql for development
+    sql-migration-prefix: V
+    sql-migration-separator: __
+    sql-migration-suffixes: .sql
+  
+  # Disable data.sql in favor of Flyway migrations
+  sql:
+    init:
+      mode: never
+      data-locations: classpath:data.sql
+
+# Development logging - reduced for faster startup
+logging:
+  level:
+    com.rossumtechsystems.eyesante_backend: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+    org.flywaydb: INFO
+    root: WARN

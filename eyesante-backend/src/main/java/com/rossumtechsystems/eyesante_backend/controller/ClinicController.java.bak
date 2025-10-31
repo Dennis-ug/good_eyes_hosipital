@@ -1,0 +1,77 @@
+package com.rossumtechsystems.eyesante_backend.controller;
+
+import com.rossumtechsystems.eyesante_backend.dto.ClinicDto;
+import com.rossumtechsystems.eyesante_backend.service.ClinicService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/clinic")
+@CrossOrigin(origins = "*")
+public class ClinicController {
+
+    @Autowired
+    private ClinicService clinicService;
+
+    /**
+     * Get the default clinic configuration for receipts
+     */
+    @GetMapping("/default")
+    public ResponseEntity<ClinicDto> getDefaultClinic() {
+        ClinicDto clinic = clinicService.getDefaultClinic();
+        return ResponseEntity.ok(clinic);
+    }
+
+    /**
+     * Get clinic by ID
+     */
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<ClinicDto> getClinicById(@PathVariable Long id) {
+        ClinicDto clinic = clinicService.getClinicById(id);
+        return ResponseEntity.ok(clinic);
+    }
+
+    /**
+     * Create or update clinic configuration
+     */
+    @PostMapping
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<ClinicDto> saveClinic(@Valid @RequestBody ClinicDto clinicDto) {
+        ClinicDto savedClinic = clinicService.saveClinic(clinicDto);
+        return ResponseEntity.ok(savedClinic);
+    }
+
+    /**
+     * Update clinic configuration
+     */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<ClinicDto> updateClinic(@PathVariable Long id, @Valid @RequestBody ClinicDto clinicDto) {
+        clinicDto.setId(id);
+        ClinicDto updatedClinic = clinicService.saveClinic(clinicDto);
+        return ResponseEntity.ok(updatedClinic);
+    }
+
+    /**
+     * Set a clinic as default
+     */
+    @PostMapping("/{id}/set-default")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<ClinicDto> setDefaultClinic(@PathVariable Long id) {
+        ClinicDto defaultClinic = clinicService.setDefaultClinic(id);
+        return ResponseEntity.ok(defaultClinic);
+    }
+
+    /**
+     * Get receipt contact information (public endpoint)
+     */
+    @GetMapping("/receipt-info")
+    public ResponseEntity<ClinicDto> getReceiptInfo() {
+        ClinicDto clinic = clinicService.getDefaultClinic();
+        return ResponseEntity.ok(clinic);
+    }
+}

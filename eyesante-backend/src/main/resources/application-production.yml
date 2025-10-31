@@ -1,0 +1,94 @@
+spring:
+  # Production-specific optimizations
+  jpa:
+    hibernate:
+      ddl-auto: none  # Let Flyway handle schema
+    defer-datasource-initialization: false  # Disable to prevent circular dependency
+    properties:
+      hibernate:
+        # Disable schema validation for faster startup
+        hbm2ddl:
+          auto: none
+        # Optimize for production
+        jdbc:
+          batch_size: 50
+          fetch_size: 50
+        # Disable statistics for faster startup
+        generate_statistics: false
+        # Optimize connection pool
+        connection:
+          provider_disables_autocommit: true
+        # Disable second-level cache
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+          region:
+            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+  
+  # Startup completion indicator
+  main:
+    banner-mode: console
+  
+  # Production database migration settings with data protection
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    validate-on-migrate: false  # Disable validation to prevent circular dependency
+    locations: classpath:db/migration
+    batch: true
+    clean-disabled: true  # Prevent accidental database cleanup
+    # Disable data.sql in production
+    sql-migration-prefix: V
+    sql-migration-separator: __
+    sql-migration-suffixes: .sql
+    # Data protection settings
+    out-of-order: false  # Ensure migrations run in order
+    ignore-migration-patterns: "*:missing"  # Don't fail on missing migrations
+    # Fix circular dependency
+    init-sql: ""
+    # Backup before migration (if using Flyway Enterprise)
+    # backup-before-migrate: true
+
+  # Optimize Tomcat for production
+server:
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    max-connections: 8192
+    accept-count: 100
+    connection-timeout: 20000
+    # Enable keep-alive for better performance
+    keep-alive-timeout: 60000
+    max-keep-alive-requests: 100
+
+# Production logging - show essential startup messages
+logging:
+  level:
+    root: WARN
+    com.rossumtechsystems.eyesante_backend: INFO
+    org.springframework.security: WARN
+    org.springframework.boot: INFO
+    org.springframework.context: INFO
+    org.springframework.web: WARN
+    org.hibernate: WARN
+    org.apache.tomcat: INFO
+    org.apache.catalina: INFO
+    org.apache.coyote: WARN
+    # Show startup completion messages
+    org.springframework.boot.autoconfigure.logging: INFO
+    # Disable Hibernate SQL logging in production
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+
+# JVM optimizations for production
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+

@@ -1,0 +1,4 @@
+ALTER TABLE patient_diagnoses
+ADD COLUMN IF NOT EXISTS eye_side VARCHAR(10) NULL;
+
+

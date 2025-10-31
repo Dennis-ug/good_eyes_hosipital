@@ -1,0 +1,214 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --border: 214.3 31.8% 91.4%;
+  --ring: 214.3 31.8% 91.4%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --border: 217.2 32.6% 17.5%;
+  --ring: 217.2 32.6% 17.5%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Dark mode styles for form inputs and text fields */
+input, textarea, select {
+  background-color: var(--background);
+  color: var(--foreground);
+  border-color: hsl(var(--border));
+}
+
+/* Dark mode styles for input focus states */
+input:focus, textarea:focus, select:focus {
+  background-color: var(--background);
+  color: var(--foreground);
+  border-color: hsl(var(--ring));
+  outline: none;
+}
+
+/* Dark mode styles for placeholder text */
+input::placeholder, textarea::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Dark mode styles for disabled inputs */
+input:disabled, textarea:disabled, select:disabled {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  cursor: not-allowed;
+}
+
+/* Dark mode styles for search inputs */
+input[type="search"] {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Dark mode styles for number inputs */
+input[type="number"] {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Dark mode styles for email inputs */
+input[type="email"] {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Dark mode styles for password inputs */
+input[type="password"] {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Dark mode styles for date inputs */
+input[type="date"] {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Dark mode styles for time inputs */
+input[type="time"] {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Dark mode styles for datetime-local inputs */
+input[type="datetime-local"] {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Additional dark mode improvements */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #404040;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #9ca3af;
+}
+
+.dark input:disabled,
+.dark textarea:disabled,
+.dark select:disabled {
+  background-color: #262626;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+/* Ensure proper contrast for all form elements */
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark input[type="search"],
+.dark input[type="tel"],
+.dark input[type="url"],
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="datetime-local"],
+.dark input[type="month"],
+.dark input[type="week"],
+.dark textarea,
+.dark select {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #404040;
+}
+
+.dark input[type="text"]:focus,
+.dark input[type="email"]:focus,
+.dark input[type="password"]:focus,
+.dark input[type="number"]:focus,
+.dark input[type="search"]:focus,
+.dark input[type="tel"]:focus,
+.dark input[type="url"]:focus,
+.dark input[type="date"]:focus,
+.dark input[type="time"]:focus,
+.dark input[type="datetime-local"]:focus,
+.dark input[type="month"]:focus,
+.dark input[type="week"]:focus,
+.dark textarea:focus,
+.dark select:focus {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Override Tailwind dark mode classes for better visibility */
+.dark .dark\:bg-gray-700 {
+  background-color: #1a1a1a !important;
+}
+
+.dark .dark\:text-white {
+  color: #ffffff !important;
+}
+
+.dark .dark\:border-gray-600 {
+  border-color: #404040 !important;
+}
+
+.dark .dark\:placeholder-gray-500 {
+  color: #9ca3af !important;
+}
+
+.dark .dark\:focus\:ring-blue-500:focus {
+  --tw-ring-color: #3b82f6 !important;
+}
+
+.dark .dark\:focus\:border-blue-500:focus {
+  border-color: #3b82f6 !important;
+}
+
+/* Ensure proper contrast for any remaining form elements */
+.dark form input,
+.dark form textarea,
+.dark form select {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border-color: #404040 !important;
+}
+
+.dark form input:focus,
+.dark form textarea:focus,
+.dark form select:focus {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}

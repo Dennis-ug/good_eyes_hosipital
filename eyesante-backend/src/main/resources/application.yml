@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: eyesante-backend
+  dotenv:
+    location: ../.env
+    ignore:
+      - SPRING_PROFILES_ACTIVE
+  
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 900000
+      auto-commit: false
+      connection-test-query: SELECT 1
+    
+  jpa:
+    hibernate:
+      ddl-auto: none  # Flyway manages schema
+    show-sql: false
+    open-in-view: false
+    defer-datasource-initialization: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        jdbc:
+          batch_size: 20
+          fetch_size: 20
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+        connection:
+          provider_disables_autocommit: true
+        # Remove jta platform, not needed for Postgres + Spring Data
+
+  flyway:
+    enabled: false
+
+  mail:
+    host: ${SPRING_MAIL_HOST:localhost}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    from: ${SPRING_MAIL_FROM:noreply@rossumtechsystems.com}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+          connectiontimeout: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_CONNECTIONTIMEOUT:5000}
+          timeout: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_TIMEOUT:5000}
+          writetimeout: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_WRITETIMEOUT:5000}
+
+app:
+  jwt-secret: ${APP_JWT_SECRET}
+  jwt-expiration-milliseconds: ${APP_JWT_EXPIRATION_MILLISECONDS}
+  jwt-refresh-expiration-milliseconds: ${APP_JWT_REFRESH_EXPIRATION_MILLISECONDS}
+
+server:
+  port: ${SERVER_PORT:5025}

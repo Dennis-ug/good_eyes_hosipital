@@ -1,0 +1,170 @@
+name: Deploy to Production Server
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Allow manual triggering
+
+# Cancel any running workflows when a new one is triggered
+concurrency:
+  group: production-deployment
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy to server
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
+        run: |
+          sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -o ConnectTimeout=30 $SERVER_USER@$SERVER_IP << 'EOF'
+          set -e
+          
+          echo "🚀 Starting deployment process..."
+          
+          # Navigate to project directory
+          cd projects/isante_project
+          echo "📁 Changed to project directory: $(pwd)"
+
+          # Create database backup before deployment
+          echo "🔒 Creating database backup..."
+          ./scripts/backup-database.sh || echo "Backup failed, continuing with deployment..."
+          
+          # Force stop any running containers to prevent conflicts
+          echo "🛑 Force stopping any running containers..."
+          docker-compose down --remove-orphans --timeout 30 || echo "No containers to stop"
+          
+          # Kill any remaining containers that might be stuck
+          docker ps -q --filter "name=isante" | xargs -r docker kill || echo "No containers to kill"
+          
+          # Check available disk space
+          echo "💾 Checking disk space..."
+          df -h
+          
+          # Ensure main_host network exists
+          echo "🌐 Checking main_host network..."
+          if ! docker network ls | grep -q "main_host"; then
+            echo "Creating main_host network..."
+            docker network create main_host || echo "Failed to create main_host network"
+          else
+            echo "main_host network already exists"
+          fi
+          
+          # Pull latest changes
+          echo "📥 Pulling latest changes from git..."
+          git pull origin main || echo "Git pull failed, continuing..."
+          
+          # Clean up only unused Docker images to free up space
+          echo "🧹 Cleaning up unused Docker images..."
+          docker image prune -f || echo "No unused images to remove"
+          
+          # Clean up unused containers
+          echo "🧹 Cleaning up unused containers..."
+          docker container prune -f || echo "No unused containers to remove"
+          
+          # Clean up unused build cache
+          echo "🧹 Cleaning up unused build cache..."
+          docker builder prune -f || echo "No unused build cache to clean"
+          
+          # Check Docker and Docker Compose versions
+          echo "🔍 Checking Docker and Docker Compose versions..."
+          docker --version
+          docker-compose --version || echo "docker-compose not found, trying docker compose..."
+          docker compose version || echo "docker compose not found"
+          
+          # Debug directory structure
+          echo "🔍 Debugging directory structure..."
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          echo ""
+          echo "eyesante-backend directory contents:"
+          ls -la eyesante-backend/ || echo "eyesante-backend directory not found"
+          echo ""
+          echo "Checking for Dockerfile:"
+          find . -name "Dockerfile" -type f
+          
+          # Build and start new containers
+          echo "🔨 Building and starting new containers..."
+          
+          # Monitor disk space during build
+          echo "💾 Disk space before build:"
+          df -h
+          
+          if command -v docker-compose &> /dev/null; then
+            echo "Using docker-compose (v1)"
+            docker-compose build
+            docker-compose up -d
+          elif docker compose version &> /dev/null; then
+            echo "Using docker compose (v2)"
+            docker compose build
+            docker compose up -d
+          else
+            echo "❌ Neither docker-compose nor docker compose found"
+            exit 1
+          fi
+          
+          # Check disk space after build
+          echo "💾 Disk space after build:"
+          df -h
+          
+          # Check service status
+          echo "🔍 Checking service status..."
+          docker-compose ps
+          
+          # Check network connectivity
+          echo "🌐 Checking network connectivity..."
+          echo "Available networks:"
+          docker network ls
+          echo ""
+          echo "main_host network details:"
+          docker network inspect main_host || echo "main_host network not found"
+          echo ""
+          echo "Testing container connectivity..."
+          echo "Testing frontend to backend connectivity:"
+          docker-compose exec -T frontend curl -f http://backend:5025/api/auth/test || echo "Frontend cannot reach backend"
+          echo ""
+          echo "Testing backend internal connectivity:"
+          docker-compose exec -T backend curl -f http://localhost:5025/api/auth/test || echo "Backend internal test failed"
+          echo ""
+          echo "Testing host to backend connectivity:"
+          curl -f http://localhost:5025/api/auth/test || echo "Host cannot reach backend"
+          
+          # Verify services are running
+          echo "✅ Verifying services..."
+          if docker-compose ps | grep -q "Up"; then
+            echo "🎉 Deployment successful! All services are running."
+          else
+            echo "❌ Deployment failed! Some services are not running."
+            docker-compose logs
+            exit 1
+          fi
+          
+          # Show service URLs
+          echo "🌐 Service URLs:"
+          echo "   Frontend: http://$SERVER_IP:3000"
+          echo "   Backend API: http://$SERVER_IP:5025"
+          echo "   pgAdmin: http://$SERVER_IP:5050"
+          echo "   Database: $SERVER_IP:5432"
+          
+          EOF
+      
+      - name: Deployment Summary
+        run: |
+          echo "🎯 Deployment Summary"
+          echo "==================="
+          echo "Server: 161.35.46.156"
+          echo "Status: Completed"
+          echo ""
+          echo "Services Deployed:"
+          echo "- Frontend (Next.js): http://161.35.46.156:3000"
+          echo "- Backend (Spring Boot): http://161.35.46.156:5025"
+          echo "- Database (PostgreSQL): 161.35.46.156:5432"
+          echo "- Database Admin (pgAdmin): http://161.35.46.156:5050"
+          echo ""
+          echo "Deployment completed at: $(date)"

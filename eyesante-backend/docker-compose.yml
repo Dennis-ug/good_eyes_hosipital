@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: eyesante-postgres
+    environment:
+      POSTGRES_DB: eyesante_db
+      POSTGRES_USER: eyesante_admin
+      POSTGRES_PASSWORD: eyesante_admin_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - main_host
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eyesante_admin -d eyesante_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Spring Boot Application
+  app:
+    build: .
+    container_name: eyesante-backend
+    ports:
+      - "5025:5025"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/eyesante_db
+      SPRING_DATASOURCE_USERNAME: eyesante_admin
+      SPRING_DATASOURCE_PASSWORD: eyesante_admin_password
+      APP_JWT_SECRET: your-super-secret-jwt-key-change-this-in-production-make-it-longer-than-64-bytes-for-security
+      APP_JWT_EXPIRATION_MILLISECONDS: 86400000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - main_host
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  main_host:
+    driver: bridge 
