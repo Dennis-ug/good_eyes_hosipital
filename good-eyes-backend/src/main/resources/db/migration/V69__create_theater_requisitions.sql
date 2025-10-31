@@ -1,8 +1,9 @@
 -- Migration V69: Create Theater Requisitions System
 -- This migration creates the complete theater requisition workflow system
+-- Note: Uses IF NOT EXISTS to handle case where tables were created in V68
 
 -- Theater Requisitions Table
-CREATE TABLE theater_requisitions (
+CREATE TABLE IF NOT EXISTS theater_requisitions (
     id SERIAL PRIMARY KEY,
     requisition_number VARCHAR(50) UNIQUE NOT NULL,
     title VARCHAR(200) NOT NULL,
@@ -23,7 +24,7 @@ CREATE TABLE theater_requisitions (
 );
 
 -- Theater Requisition Items Table
-CREATE TABLE theater_requisition_items (
+CREATE TABLE IF NOT EXISTS theater_requisition_items (
     id SERIAL PRIMARY KEY,
     requisition_id INTEGER REFERENCES theater_requisitions(id) ON DELETE CASCADE,
     consumable_item_id INTEGER REFERENCES consumable_items(id) NOT NULL,
@@ -39,11 +40,11 @@ CREATE TABLE theater_requisition_items (
 );
 
 -- Theater Store Transfers Table (tracks stock movements from general store to theater stores)
-CREATE TABLE theater_store_transfers (
+CREATE TABLE IF NOT EXISTS theater_store_transfers (
     id SERIAL PRIMARY KEY,
     requisition_id INTEGER REFERENCES theater_requisitions(id),
     from_store VARCHAR(100) NOT NULL DEFAULT 'General Store',
-    to_theater_store_id INTEGER REFERENCES theater_stores(id),
+    to_theater_store_id INTEGER, -- FK added later if theater_stores exists
     transfer_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     transferred_by_user_id INTEGER REFERENCES users(id),
     status VARCHAR(20) DEFAULT 'PENDING', -- PENDING, COMPLETED, CANCELLED
@@ -52,7 +53,7 @@ CREATE TABLE theater_store_transfers (
 );
 
 -- Theater Store Transfer Items Table
-CREATE TABLE theater_store_transfer_items (
+CREATE TABLE IF NOT EXISTS theater_store_transfer_items (
     id SERIAL PRIMARY KEY,
     transfer_id INTEGER REFERENCES theater_store_transfers(id) ON DELETE CASCADE,
     consumable_item_id INTEGER REFERENCES consumable_items(id) NOT NULL,
@@ -65,11 +66,11 @@ CREATE TABLE theater_store_transfer_items (
 );
 
 -- Theater Procedure Usage Table (surgeon records actual usage during procedures)
-CREATE TABLE theater_procedure_usage (
+CREATE TABLE IF NOT EXISTS theater_procedure_usage (
     id SERIAL PRIMARY KEY,
     patient_procedure_id INTEGER REFERENCES patient_procedures(id) NOT NULL,
     consumable_item_id INTEGER REFERENCES consumable_items(id) NOT NULL,
-    theater_store_id INTEGER REFERENCES theater_stores(id),
+    theater_store_id INTEGER, -- FK added later if theater_stores exists
     quantity_used DECIMAL(10,2) NOT NULL,
     used_by_user_id INTEGER REFERENCES users(id) NOT NULL,
     usage_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -79,28 +80,28 @@ CREATE TABLE theater_procedure_usage (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create indexes for better performance
-CREATE INDEX idx_theater_requisitions_status ON theater_requisitions(status);
-CREATE INDEX idx_theater_requisitions_requested_by ON theater_requisitions(requested_by_user_id);
-CREATE INDEX idx_theater_requisitions_approved_by ON theater_requisitions(approved_by_user_id);
-CREATE INDEX idx_theater_requisitions_date ON theater_requisitions(requested_date);
-CREATE INDEX idx_theater_requisitions_procedure ON theater_requisitions(patient_procedure_id);
+-- Create indexes for better performance (IF NOT EXISTS is implicit for indexes - will skip if exists)
+CREATE INDEX IF NOT EXISTS idx_theater_requisitions_status ON theater_requisitions(status);
+CREATE INDEX IF NOT EXISTS idx_theater_requisitions_requested_by ON theater_requisitions(requested_by_user_id);
+CREATE INDEX IF NOT EXISTS idx_theater_requisitions_approved_by ON theater_requisitions(approved_by_user_id);
+CREATE INDEX IF NOT EXISTS idx_theater_requisitions_date ON theater_requisitions(requested_date);
+CREATE INDEX IF NOT EXISTS idx_theater_requisitions_procedure ON theater_requisitions(patient_procedure_id);
 
-CREATE INDEX idx_theater_requisition_items_requisition ON theater_requisition_items(requisition_id);
-CREATE INDEX idx_theater_requisition_items_consumable ON theater_requisition_items(consumable_item_id);
+CREATE INDEX IF NOT EXISTS idx_theater_requisition_items_requisition ON theater_requisition_items(requisition_id);
+CREATE INDEX IF NOT EXISTS idx_theater_requisition_items_consumable ON theater_requisition_items(consumable_item_id);
 
-CREATE INDEX idx_theater_store_transfers_requisition ON theater_store_transfers(requisition_id);
-CREATE INDEX idx_theater_store_transfers_status ON theater_store_transfers(status);
+CREATE INDEX IF NOT EXISTS idx_theater_store_transfers_requisition ON theater_store_transfers(requisition_id);
+CREATE INDEX IF NOT EXISTS idx_theater_store_transfers_status ON theater_store_transfers(status);
 
-CREATE INDEX idx_theater_store_transfer_items_transfer ON theater_store_transfer_items(transfer_id);
-CREATE INDEX idx_theater_store_transfer_items_consumable ON theater_store_transfer_items(consumable_item_id);
+CREATE INDEX IF NOT EXISTS idx_theater_store_transfer_items_transfer ON theater_store_transfer_items(transfer_id);
+CREATE INDEX IF NOT EXISTS idx_theater_store_transfer_items_consumable ON theater_store_transfer_items(consumable_item_id);
 
-CREATE INDEX idx_theater_procedure_usage_procedure ON theater_procedure_usage(patient_procedure_id);
-CREATE INDEX idx_theater_procedure_usage_consumable ON theater_procedure_usage(consumable_item_id);
-CREATE INDEX idx_theater_procedure_usage_date ON theater_procedure_usage(usage_date);
+CREATE INDEX IF NOT EXISTS idx_theater_procedure_usage_procedure ON theater_procedure_usage(patient_procedure_id);
+CREATE INDEX IF NOT EXISTS idx_theater_procedure_usage_consumable ON theater_procedure_usage(consumable_item_id);
+CREATE INDEX IF NOT EXISTS idx_theater_procedure_usage_date ON theater_procedure_usage(usage_date);
 
--- Create sequence for requisition numbers
-CREATE SEQUENCE theater_requisition_number_seq START 1;
+-- Create sequence for requisition numbers (if not exists)
+CREATE SEQUENCE IF NOT EXISTS theater_requisition_number_seq START 1;
 
 -- Create function to generate requisition numbers
 CREATE OR REPLACE FUNCTION generate_theater_requisition_number()
@@ -129,3 +130,32 @@ COMMENT ON TABLE theater_procedure_usage IS 'Records actual usage of consumables
 COMMENT ON COLUMN theater_requisitions.status IS 'DRAFT, SUBMITTED, APPROVED, REJECTED, FULFILLED, CANCELLED';
 COMMENT ON COLUMN theater_requisitions.priority IS 'LOW, MEDIUM, HIGH, URGENT';
 COMMENT ON COLUMN theater_store_transfers.status IS 'PENDING, COMPLETED, CANCELLED';
+
+-- Add foreign key constraints if they don't exist (for tables created in V68)
+-- Check and add FK to theater_stores in theater_store_transfers
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'theater_stores') THEN
+        -- Add FK constraint if column exists but constraint doesn't
+        IF NOT EXISTS (
+            SELECT 1 FROM information_schema.table_constraints 
+            WHERE constraint_name = 'theater_store_transfers_to_theater_store_id_fkey'
+            AND table_name = 'theater_store_transfers'
+        ) THEN
+            ALTER TABLE theater_store_transfers 
+            ADD CONSTRAINT theater_store_transfers_to_theater_store_id_fkey 
+            FOREIGN KEY (to_theater_store_id) REFERENCES theater_stores(id);
+        END IF;
+        
+        -- Add FK constraint for theater_procedure_usage
+        IF NOT EXISTS (
+            SELECT 1 FROM information_schema.table_constraints 
+            WHERE constraint_name = 'theater_procedure_usage_theater_store_id_fkey'
+            AND table_name = 'theater_procedure_usage'
+        ) THEN
+            ALTER TABLE theater_procedure_usage 
+            ADD CONSTRAINT theater_procedure_usage_theater_store_id_fkey 
+            FOREIGN KEY (theater_store_id) REFERENCES theater_stores(id);
+        END IF;
+    END IF;
+END $$;
