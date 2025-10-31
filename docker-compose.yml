@@ -52,8 +52,8 @@ services:
     container_name: good-eyes-frontend
     env_file:
       - .env
-    ports:
-      - "3000:3000"
+    # ports:
+    #   - "3000:3000"
     depends_on:
       - backend
     networks:
