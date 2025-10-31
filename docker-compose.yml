@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`isante-api.rossumtechsystems.com`)"
+      - "traefik.http.routers.backend.rule=Host(`good-eyes-api.rossumtechsystems.com`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls=true"
       - "traefik.http.routers.backend.tls.certresolver=production"
