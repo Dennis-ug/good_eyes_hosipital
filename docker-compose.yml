@@ -23,9 +23,9 @@ services:
   # Spring Boot Backend Application
   backend:
     build:
-      context: ./eyesante-backend 
+      context: ./good-eyes-backend
       dockerfile: Dockerfile
-    container_name: isante-backend
+    container_name: good-eyes-backend
     env_file:
       - .env
     ports:
@@ -48,8 +48,8 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: ./isante-front-end/Dockerfile
-    container_name: isante-frontend
+      dockerfile: ./good-eyes-front-end/Dockerfile
+    container_name: good-eyes-frontend
     env_file:
       - .env
     ports:
