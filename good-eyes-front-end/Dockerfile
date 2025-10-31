@@ -9,14 +9,14 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies using npm
-COPY isante-front-end/package.json isante-front-end/package-lock.json ./
+COPY good-eyes-front-end/package.json good-eyes-front-end/package-lock.json ./
 RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY isante-front-end/ .
+COPY good-eyes-front-end/ .
 
 # Copy .env file from root directory
 COPY .env* ./

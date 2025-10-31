@@ -1,7 +1,7 @@
 version: '3.3'
 
 services:
-  # PostgreSQL Database for iSante
+  # PostgreSQL Database for Good Eyes Hospital
   # postgres:
   #   image: postgres:15-alpine
   #   container_name: isante-postgres
@@ -68,7 +68,7 @@ services:
       - "traefik.http.routers.frontend.tls.certresolver=production"
       - "traefik.http.routers.frontend.middlewares=rate-limit@file"
 
-  # pgAdmin - Database Management Interface for iSante
+  # pgAdmin - Database Management Interface for Good Eyes Hospital
   # isante-pgadmin:
   #   image: dpage/pgadmin4:latest
   #   container_name: isante-pgadmin
@@ -82,7 +82,7 @@ services:
   #     # Auto-configure database connection
   #     PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
   #     # Server configuration via environment variables
-  #     PGADMIN_CONFIG_SERVERS_JSON: '{"Servers":{"1":{"Name":"iSante PostgreSQL","Group":"Servers","Host":"postgres","Port":5432,"MaintenanceDB":"eyesante_db","Username":"eyesante_admin","Password":"eyesante_admin_password","SSLMode":"prefer"}}}'
+     #     PGADMIN_CONFIG_SERVERS_JSON: '{"Servers":{"1":{"Name":"Good Eyes Hospital PostgreSQL","Group":"Servers","Host":"postgres","Port":5432,"MaintenanceDB":"eyesante_db","Username":"eyesante_admin","Password":"eyesante_admin_password","SSLMode":"prefer"}}}'
   #   volumes:
   #     - isante_pgadmin_data:/var/lib/pgadmin
   #     - ./pgadmin-servers.json:/pgadmin4/servers.json
