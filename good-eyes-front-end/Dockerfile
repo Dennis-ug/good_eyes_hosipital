@@ -42,9 +42,10 @@ RUN apk add --no-cache wget && \
     adduser --system --uid 1001 nextjs
 
 # Copy only the necessary files from the standalone build
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# Next.js standalone includes server.js in .next/standalone directory
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 USER nextjs
 
