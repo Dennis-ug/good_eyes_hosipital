@@ -1,38 +1,127 @@
-version: '3.8'
+version: '3.3'
 
 services:
-  # Frontend Application
-  frontend:
+  # Spring Boot Backend Application
+  good-eyes-backend:
     build:
-      context: .
+      context: ./good-eyes-backend
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - BACKEND_URL=http://eyesante-backend/api
-      - NODE_ENV=production
-      - NEXT_TELEMETRY_DISABLED=1
-    restart: unless-stopped
+    container_name: good-eyes-backend
+    env_file:
+      - .env
+    # ports:
+    #   - "5025:5025"
+    # Note: Ports are not exposed to host to avoid conflicts. Services are accessible via Traefik only.
+    # depends_on:
+    #   - postgres
     networks:
       - main_host
+      
+    restart: unless-stopped
+    # Health check runs inside container, so localhost:5025 refers to container's localhost (not host)
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5025/api/auth/test"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
-
-      
-    
+      start_period: 60s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`isante-dash.rossumtechsystems.com`)"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls=true"
-      - "traefik.http.routers.app.tls.certresolver=production"
+      - "traefik.docker.network=main_host"
+      - "traefik.http.routers.good-eyes-backend.rule=Host(`good-eyes-api.rossumtechsystems.com`)"
+      - "traefik.http.routers.good-eyes-backend.entrypoints=websecure"
+      - "traefik.http.routers.good-eyes-backend.tls=true"
+      - "traefik.http.routers.good-eyes-backend.tls.certresolver=production"
+      - "traefik.http.routers.good-eyes-backend.middlewares=rate-limit@file"
+      - "traefik.http.routers.good-eyes-backend.service=good-eyes-backend"
+      # Traefik service configuration
+      - "traefik.http.services.good-eyes-backend.loadbalancer.server.port=5025"
+      - "traefik.http.services.good-eyes-backend.loadbalancer.server.scheme=http"
+      # Health check configuration for Traefik
+      - "traefik.http.services.good-eyes-backend.loadbalancer.healthcheck.path=/api/auth/test"
+      - "traefik.http.services.good-eyes-backend.loadbalancer.healthcheck.interval=30s"
+      - "traefik.http.services.good-eyes-backend.loadbalancer.healthcheck.timeout=10s"
+      - "traefik.http.services.good-eyes-backend.loadbalancer.healthcheck.scheme=http"
 
+  # Next.js Frontend Application
+  good-eyes-frontend:
+    build:
+      context: .
+      dockerfile: ./good-eyes-front-end/Dockerfile
+    container_name: good-eyes-frontend
+    env_file:
+      - .env
+    # ports:
+    #   - "3000:3000"
+    # Note: Ports are not exposed to host to avoid conflicts. Services are accessible via Traefik only.
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - main_host
+    restart: unless-stopped
+    # Health check runs inside container, so localhost:3000 refers to container's localhost (not host)
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=main_host"
+      - "traefik.http.routers.good-eyes-frontend.rule=Host(`good-eyes.rossumtechsystems.com`)"
+      - "traefik.http.routers.good-eyes-frontend.entrypoints=websecure"
+      - "traefik.http.routers.good-eyes-frontend.tls=true"
+      - "traefik.http.routers.good-eyes-frontend.tls.certresolver=production"
+      - "traefik.http.routers.good-eyes-frontend.middlewares=rate-limit@file"
+      - "traefik.http.routers.good-eyes-frontend.service=good-eyes-frontend"
+      # Traefik service configuration
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.server.port=3000"
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.server.scheme=http"
+      # Health check configuration for Traefik
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.healthcheck.path=/api/health"
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.healthcheck.interval=30s"
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.healthcheck.timeout=10s"
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.healthcheck.scheme=http"
+
+  # pgAdmin - Database Management Interface for Good Eyes Hospital
+  # isante-pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   container_name: isante-pgadmin
+  #   ports:
+  #     - "5050:80"
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: admin@eyesante.com
+  #     PGADMIN_DEFAULT_PASSWORD: admin123
+  #     PGADMIN_CONFIG_SERVER_MODE: 'False'
+  #     PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+  #     # Auto-configure database connection
+  #     PGADMIN_SERVER_JSON_FILE: /pgadmin4/servers.json
+  #     # Server configuration via environment variables
+     #     PGADMIN_CONFIG_SERVERS_JSON: '{"Servers":{"1":{"Name":"Good Eyes Hospital PostgreSQL","Group":"Servers","Host":"postgres","Port":5432,"MaintenanceDB":"eyesante_db","Username":"eyesante_admin","Password":"eyesante_admin_password","SSLMode":"prefer"}}}'
+  #   volumes:
+  #     - isante_pgadmin_data:/var/lib/pgadmin
+  #     - ./pgadmin-servers.json:/pgadmin4/servers.json
+  #   depends_on:
+  #     - postgres
+  #   networks:
+  #     - main_host
+  #   restart: unless-stopped
+
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.isante-pgadmin.rule=Host(`isante-pgadmin.rossumtechsystems.com`)"
+  #     - "traefik.http.routers.isante-pgadmin.entrypoints=websecure"
+  #     - "traefik.http.routers.isante-pgadmin.tls=true"
+  #     - "traefik.http.routers.isante-pgadmin.tls.certresolver=production"
+
+volumes:
+  isante_postgres_data:
+  isante_pgadmin_data:
+  isante_backup_data:
 
 
 networks:
   main_host:
-    external: true 
+    external: true
