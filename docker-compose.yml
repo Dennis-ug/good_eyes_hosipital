@@ -47,20 +47,20 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=main_host"
-      - "traefik.http.routers.backend.rule=Host(`good-eyes-api.rossumtechsystems.com`)"
-      - "traefik.http.routers.backend.entrypoints=websecure"
-      - "traefik.http.routers.backend.tls=true"
-      - "traefik.http.routers.backend.tls.certresolver=production"
-      - "traefik.http.routers.backend.middlewares=rate-limit@file"
-      - "traefik.http.routers.backend.service=backend"
+      - "traefik.http.routers.good-eyes-backend.rule=Host(`good-eyes-api.rossumtechsystems.com`)"
+      - "traefik.http.routers.good-eyes-backend.entrypoints=websecure"
+      - "traefik.http.routers.good-eyes-backend.tls=true"
+      - "traefik.http.routers.good-eyes-backend.tls.certresolver=production"
+      - "traefik.http.routers.good-eyes-backend.middlewares=rate-limit@file"
+      - "traefik.http.routers.good-eyes-backend.service=good-eyes-backend"
       # Traefik service configuration
-      - "traefik.http.services.backend.loadbalancer.server.port=5025"
-      - "traefik.http.services.backend.loadbalancer.server.scheme=http"
+      - "traefik.http.services.good-eyes-backend.loadbalancer.server.port=5025"
+      - "traefik.http.services.good-eyes-backend.loadbalancer.server.scheme=http"
       # Health check configuration for Traefik
-      - "traefik.http.services.backend.loadbalancer.healthcheck.path=/api/auth/test"
-      - "traefik.http.services.backend.loadbalancer.healthcheck.interval=30s"
-      - "traefik.http.services.backend.loadbalancer.healthcheck.timeout=10s"
-      - "traefik.http.services.backend.loadbalancer.healthcheck.scheme=http"
+      - "traefik.http.services.good-eyes-backend.loadbalancer.healthcheck.path=/api/auth/test"
+      - "traefik.http.services.good-eyes-backend.loadbalancer.healthcheck.interval=30s"
+      - "traefik.http.services.good-eyes-backend.loadbalancer.healthcheck.timeout=10s"
+      - "traefik.http.services.good-eyes-backend.loadbalancer.healthcheck.scheme=http"
 
   # Next.js Frontend Application
   frontend:
@@ -89,20 +89,20 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=main_host"
-      - "traefik.http.routers.frontend.rule=Host(`good-eyes.rossumtechsystems.com`)"
-      - "traefik.http.routers.frontend.entrypoints=websecure"
-      - "traefik.http.routers.frontend.tls=true"
-      - "traefik.http.routers.frontend.tls.certresolver=production"
-      - "traefik.http.routers.frontend.middlewares=rate-limit@file"
-      - "traefik.http.routers.frontend.service=frontend"
+      - "traefik.http.routers.good-eyes-frontend.rule=Host(`good-eyes.rossumtechsystems.com`)"
+      - "traefik.http.routers.good-eyes-frontend.entrypoints=websecure"
+      - "traefik.http.routers.good-eyes-frontend.tls=true"
+      - "traefik.http.routers.good-eyes-frontend.tls.certresolver=production"
+      - "traefik.http.routers.good-eyes-frontend.middlewares=rate-limit@file"
+      - "traefik.http.routers.good-eyes-frontend.service=good-eyes-frontend"
       # Traefik service configuration
-      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
-      - "traefik.http.services.frontend.loadbalancer.server.scheme=http"
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.server.port=3000"
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.server.scheme=http"
       # Health check configuration for Traefik
-      - "traefik.http.services.frontend.loadbalancer.healthcheck.path=/api/health"
-      - "traefik.http.services.frontend.loadbalancer.healthcheck.interval=30s"
-      - "traefik.http.services.frontend.loadbalancer.healthcheck.timeout=10s"
-      - "traefik.http.services.frontend.loadbalancer.healthcheck.scheme=http"
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.healthcheck.path=/api/health"
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.healthcheck.interval=30s"
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.healthcheck.timeout=10s"
+      - "traefik.http.services.good-eyes-frontend.loadbalancer.healthcheck.scheme=http"
 
   # pgAdmin - Database Management Interface for Good Eyes Hospital
   # isante-pgadmin:
